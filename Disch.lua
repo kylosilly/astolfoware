@@ -151,12 +151,12 @@ local GiveInvButton = MainGroupBox:AddButton({
 })
 
 local GiveHeldButton = MainGroupBox:AddButton({
-    Text = 'Give Fat Filly Inventory',
+    Text = 'Give Fat Filly Held Item',
     Func = function()
-        game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("eat"):InvokeServer(true)
+        game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("eat"):InvokeServer(false)
     end,
     DoubleClick = false,
-    Tooltip = 'Gives Fat Filly Your Whole Inventory (Basically not given items yet.)'
+    Tooltip = 'Gives Fat Filly Held Item (Basically not given items yet.)'
 })
 
 local AppraiseButton = MainGroupBox:AddButton({
@@ -192,7 +192,7 @@ FarmGroupBox:AddToggle('NeverFailToggle', {
 })
 
 FarmGroupBox:AddToggle('AutoFarmToggle', {
-    Text = 'Auto Farm',
+    Text = 'Auto Farm (Buggy asf mb gang)',
     Default = false,
     Tooltip = 'Automatically farms for you (turn on Never lose minigame before you use!)',
 
