@@ -24,15 +24,17 @@ local QuestGroupBox = Tabs.Farm:AddRightGroupbox('Quest Stuff')
 local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local NeverFail = false
 local SellAll = false
 local ModifyXp = false
+local AutoFarm = false
 
+local sinks = Workspace.restaurant.sinks
 local items = ReplicatedStorage.tools
 local Items = {}
 
@@ -62,6 +64,28 @@ local oldNamecall; oldNamecall = hookmetamethod(game, "__namecall", function(sel
     end
 
     return oldNamecall(self, unpack(args))
+end)
+
+local function Autofarm()
+    for _, sink in ipairs(sinks:GetChildren()) do
+        if sink:IsA("Model") then
+            local active = sink:FindFirstChild("active")
+            if active and active:IsA("BoolValue") and not active.Value then
+                local ProximityPrompt = sink:FindFirstChildOfClass("ProximityPrompt")
+                if ProximityPrompt then
+                    fireproximityprompt(ProximityPrompt)
+                    mouse1click()
+                    task.wait(1)
+                end
+            end
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    if AutoFarm then
+        Autofarm()
+    end
 end)
 
 local function AutoSellItems()
@@ -146,7 +170,7 @@ local AppraiseButton = MainGroupBox:AddButton({
 
 MainGroupBox:AddDivider()
 
-MainGroupBox:AddToggle('MyToggle', {
+MainGroupBox:AddToggle('AutoSellToggle', {
     Text = 'Auto Sell All',
     Default = false,
     Tooltip = 'Automatically sells all items for you.',
@@ -164,6 +188,16 @@ FarmGroupBox:AddToggle('NeverFailToggle', {
 
     Callback = function(Value)
         NeverFail = Value
+    end
+})
+
+FarmGroupBox:AddToggle('AutoFarmToggle', {
+    Text = 'Auto Farm',
+    Default = false,
+    Tooltip = 'Automatically farms for you (turn on Never lose minigame before you use!)',
+
+    Callback = function(Value)
+        AutoFarm = Value
     end
 })
 else
@@ -201,6 +235,7 @@ MenuGroup:AddButton('Unload', function()
     NeverFail = false
     AutoSell = false
     ModifyXp = false
+    AutoFarm = false
     Library:Unload() 
 end)
 
