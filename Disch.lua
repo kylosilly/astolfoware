@@ -24,8 +24,8 @@ local QuestGroupBox = Tabs.Farm:AddRightGroupbox('Quest Stuff')
 local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
@@ -74,6 +74,7 @@ local function Autofarm()
                 local ProximityPrompt = sink:FindFirstChildOfClass("ProximityPrompt")
                 if ProximityPrompt then
                     fireproximityprompt(ProximityPrompt)
+                    task.wait(1)
                     mouse1click()
                     task.wait(1)
                 end
