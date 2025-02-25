@@ -6,7 +6,7 @@ local market = game:GetService("MarketplaceService")
 local instanceinfo = market:GetProductInfo(instance)
 
 if instance == 78360449985300 then --// Disch
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/Disch.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/Disch.lua"))()
 elseif instance == 4483381587 then --// a literal baseplate.
     print("test")
 else
