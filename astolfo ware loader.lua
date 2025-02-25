@@ -1,16 +1,19 @@
-local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
-local Lib = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+local rape = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
+
+local Lib = loadstring(game:HttpGet(rape .. 'Library.lua'))()
 
 local instance = game.PlaceId
-local market = game:GetService("MarketplaceService")
-local instanceinfo = market:GetProductInfo(instance)
+local Market = game:GetService("MarketplaceService")
+local info = Market:GetProductInfo(instance)
 
-if instance == 78360449985300 then --// Disch
+if instance == 78360449985300 then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/Disch.lua"))()
-elseif instance == 4483381587 then --// a literal baseplate.
-    print("test")
 else
-    Lib:Notify('Game not found. If you want it to be supported, send this to the owner: ' .. instanceinfo.Name)
+    Lib:Notify('Game not supported: ' .. info.Name)
     Lib:Notify('Copied Discord to your clipboard')
     setclipboard('https://discord.gg/frQv5QScXS')
+end
+
+if instance == game.PlaceId then
+    Lib:Notify('Supported! loading: ' .. info.Name)
 end
