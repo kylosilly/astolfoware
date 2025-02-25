@@ -367,6 +367,15 @@ end)
 CreditsGroup:AddLabel('@kylosilly: Who made the script', true)
 
 CreditsGroup:AddButton({
+    Text = 'Join our discord!',
+    Func = function()
+        setclipboard('https://discord.gg/frQv5QScXS')
+    end,
+    DoubleClick = false,
+    Tooltip = 'Join our official discord server.'
+})
+
+CreditsGroup:AddButton({
     Text = 'Kylosilly Scriptblox',
     Func = function()
         setclipboard('https://scriptblox.com/u/CatBoy')
