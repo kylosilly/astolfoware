@@ -36,6 +36,8 @@ local MiscGroup = Tabs.Misc:AddLeftGroupbox('Misc')
 --// Services 🏳️‍🌈
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
+local Market = game:GetService("MarketplaceService")
+local Info = Market:GetProductInfo(game.PlaceId)
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
@@ -340,7 +342,7 @@ local WatermarkConnection = RunService.RenderStepped:Connect(function()
         FrameCounter = 0;
     end;
 
-    Library:SetWatermark(('Astolfo Ware | %s fps | %s ms | game: Disch'):format(
+    Library:SetWatermark(('Astolfo Ware | %s fps | %s ms | game: ' .. Info.Name):format(
         math.floor(FPS),
         math.floor(Stats.Network.ServerStatsItem['Data Ping']:GetValue())
     ));
