@@ -1,6 +1,6 @@
-local rape = 'https://raw.githubusercontent.com/KINGHUB01/Gui/main/'
+local rape = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
 
-local Lib = loadstring(game:HttpGet(rape ..'Gui%20Lib%20%5BLibrary%5D'))())
+local Lib = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 
 local Chart = game.PlaceId
 local Market = game:GetService("MarketplaceService")
