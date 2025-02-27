@@ -7,8 +7,6 @@ local Lib = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local Chart = game.PlaceId
 local Market = game:GetService("MarketplaceService")
 local Info = Market:GetProductInfo(Chart)
-local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
 
 setclipboard('https://discord.gg/frQv5QScXS')
 Lib:Notify('Copied discord link to your clipboard')
