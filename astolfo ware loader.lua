@@ -1,5 +1,6 @@
 --// Feel free to use this loader source 🐾 <3
 local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
+loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/ChatTag.lua"))()
 
 local Lib = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 
