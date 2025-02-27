@@ -12,7 +12,7 @@ function RoleCheck(Player)
         if table.find(Friends, Player.UserId) then
             Humanoid.DisplayName = " [Friend] "..Player.DisplayName
         elseif table.find(Developer, Player.UserId) then
-            Humanoid.DisplayName = " [Developer] "..Player.DisplayName
+            Humanoid.DisplayName = " [Script Developer] "..Player.DisplayName
         elseif Player.UserId == BigRat then
             Humanoid.DisplayName = "🐀 [Big Rat] "..Player.DisplayName
         elseif Player.UserId == Testers then
