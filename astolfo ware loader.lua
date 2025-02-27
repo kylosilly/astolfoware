@@ -41,4 +41,4 @@ function RoleCheck(Player)
     end
 end
 
-for _, p in pairs(Players:GetPlayers()) do RoleCheck(p) end; Players.PlayerAdded:Connect(function(Player) RoleCheck(Player); Player.CharacterAdded:Connect(function() RoleCheck(Player) end) end)
+for _, p in pairs(Players:GetPlayers()) do if p.Character then RoleCheck(p) end if not CharacterAddedConnections[p] then CharacterAddedConnections[p] = p.CharacterAdded:Connect(function(char) RoleCheck(Players:GetPlayerFromCharacter(char)) end) end end Players.PlayerAdded:Connect(function(Player) CharacterAddedConnections[Player] = Player.CharacterAdded:Connect(function(char) RoleCheck(Players:GetPlayerFromCharacter(char)) end) end) Players.PlayerRemoving:Connect(function(Player) if CharacterAddedConnections[Player] then CharacterAddedConnections[Player]:Disconnect() CharacterAddedConnections[Player] = nil end end)
