@@ -12,7 +12,7 @@ local Workspace = game:GetService("Workspace")
 
 --// Tables
 local Friends = {1660649535, 873084588, 1740785260, 608503596}
-local Developer = {1412075257, 12967961}
+local Developer = {1412075257, 12967961, 7187968387}
 local BigRat = 7060863999
 local Testers = 573649346
 
