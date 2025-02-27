@@ -1,12 +1,12 @@
-local rape = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
+local rape = 'https://raw.githubusercontent.com/KINGHUB01/Gui/main/'
 
-local Lib = loadstring(game:HttpGet(rape .. 'Library.lua'))()
+local Lib = loadstring(game:HttpGet(rape ..'Gui%20Lib%20%5BLibrary%5D'))())
 
 local Chart = game.PlaceId
 local Market = game:GetService("MarketplaceService")
 local Info = Market:GetProductInfo(Chart)
 
-setclipboard('bleh')
+setclipboard('https://discord.gg/frQv5QScXS')
 Lib:Notify('Copied discord link to your clipboard')
 
 if Chart == 78360449985300 then
