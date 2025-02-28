@@ -22,7 +22,7 @@ local LocalPlayer = Players.LocalPlayer
 local Cam = Workspace.CurrentCamera
 
 local Window = Library:CreateWindow({
-    Title = 'Astolfo Ware',
+    Title = 'Astolfo Ware (Had to remove lots of features cuz game patches)',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
