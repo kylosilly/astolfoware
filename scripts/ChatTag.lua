@@ -1,3 +1,4 @@
+--// Thanks netpa and ! nfpw for helping me find a fix!
 local Players = game:GetService("Players")
 local CharacterAddedConnections = {}
 
