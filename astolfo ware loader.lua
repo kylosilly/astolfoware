@@ -8,9 +8,15 @@ local Lib = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local Chart = game.PlaceId
 local Market = game:GetService("MarketplaceService")
 local Info = Market:GetProductInfo(Chart)
+local LocalPlayer = game:GetService("Players").LocalPlayer
 
-setclipboard('https://discord.gg/frQv5QScXS')
-Lib:Notify('Copied discord link to your clipboard')
+if identifyexecutor() then
+    local executor = identifyexecutor()
+    if executor == "Solara" or executor == "Xeno" or executor == "Nezur" then
+        LocalPlayer:Kick("Unsupported executor: " .. executor .. " Please use Velocity or a diffirent one (Copied velocity invite to your clipboard")
+        setclipboard("https://discord.gg/getvelocity")
+    end
+end
 
 if Chart == 78360449985300 then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/Disch.lua"))()
