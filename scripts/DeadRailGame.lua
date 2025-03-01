@@ -32,17 +32,22 @@ local Window = Library:CreateWindow({
 --// Tabs
 local Tabs = {
     Main = Window:AddTab('Main'),
+    Esp = Window:AddTab('Esp'),
+    Misc = Window:AddTab('Misc'),
+    GunMods = Window:AddTab('Gun mods'),
+    GunModsTutorial = Window:AddTab('Gun Mods Tutorial Ussage'),
+    World = Window:AddTab('World'),
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
 --// GroupBoxes
 local AutoDoGroup = Tabs.Main:AddLeftGroupbox('Auto Settings')
 local ItemsGroup = Tabs.Main:AddRightGroupbox('Item Settings')
-local RinnsHubEspGroup = Tabs.Main:AddLeftGroupbox('Esp Settings')
-local MiscGroup = Tabs.Main:AddRightGroupbox('Misc Settings')
-local GunModGroup = Tabs.Main:AddLeftGroupbox('Gun Mods')
-local GunModExplainedGroup = Tabs.Main:AddRightGroupbox('Gun Mods Tutorial Use')
-local WorldGroup = Tabs.Main:AddLeftGroupbox('World Settings')
+local RinnsHubEspGroup = Tabs.Esp:AddLeftGroupbox('Esp Settings')
+local MiscGroup = Tabs.Misc:AddLeftGroupbox('Misc Settings')
+local GunModGroup = Tabs.GunMods:AddLeftGroupbox('Gun Mods')
+local GunModExplainedGroup = Tabs.GunModsTutorial:AddRightGroupbox('Gun Mods Tutorial Use')
+local WorldGroup = Tabs.World:AddLeftGroupbox('World Settings')
 
 --// Variables
 local ShowTextRuntimeItems = false
