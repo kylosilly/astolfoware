@@ -35,7 +35,6 @@ local Tabs = {
     Esp = Window:AddTab('Esp'),
     Misc = Window:AddTab('Misc'),
     GunMods = Window:AddTab('Gun mods'),
-    GunModsTutorial = Window:AddTab('Gun Mods Tutorial Ussage'),
     World = Window:AddTab('World'),
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
@@ -46,8 +45,11 @@ local ItemsGroup = Tabs.Main:AddRightGroupbox('Item Settings')
 local RinnsHubEspGroup = Tabs.Esp:AddLeftGroupbox('Esp Settings')
 local MiscGroup = Tabs.Misc:AddLeftGroupbox('Misc Settings')
 local GunModGroup = Tabs.GunMods:AddLeftGroupbox('Gun Mods')
-local GunModExplainedGroup = Tabs.GunModsTutorial:AddRightGroupbox('Gun Mods Tutorial Use')
+local GunModExplainedGroup = Tabs.GunMods:AddRightGroupbox('Gun Mods Tutorial Use')
 local WorldGroup = Tabs.World:AddLeftGroupbox('World Settings')
+
+--// Tables
+local RuntimeItems = workspace.RuntimeItems
 
 --// Variables
 local ShowTextRuntimeItems = false
@@ -73,7 +75,6 @@ RunService.RenderStepped:Connect(function()
             if v:IsA("Model") and v:FindFirstChild("ObjectInfo") then
                 v.ObjectInfo.Enabled = true
                 v.ObjectInfo.StudsOffset = Vector3.new(0, 0, 0)
-                v.ObjectInfo.Size = UDim2.new(XSizeText, 0, YSizeText, 0)
             end
         end
     end
@@ -167,36 +168,9 @@ RinnsHubEspGroup:AddToggle('RuntimeItems', {
                 if v:IsA("Model") and v:FindFirstChild("ObjectInfo") then
                     v.ObjectInfo.Enabled = false
                     v.ObjectInfo.StudsOffset = Vector3.new(0, 2,5, 0)
-                    v.ObjectInfo.Size = UDim2.new(3, 0, 3, 0)
                 end
             end
         end
-    end
-})
-
-RinnsHubEspGroup:AddSlider('XSizeText', {
-    Text = 'Size change X',
-    Default = 3,
-    Min = 1,
-    Max = 50,
-    Rounding = 1,
-    Compact = false,
-
-    Callback = function(Value)
-        XSizeText = Value
-    end
-})
-
-RinnsHubEspGroup:AddSlider('YSizeText', {
-    Text = 'Size change Y',
-    Default = 3,
-    Min = 1,
-    Max = 50,
-    Rounding = 1,
-    Compact = false,
-
-    Callback = function(Value)
-        YSizeText = Value
     end
 })
 
