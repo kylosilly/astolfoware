@@ -1,4 +1,3 @@
---// Feel free to skid idc
 local repo = 'https://raw.githubusercontent.com/KINGHUB01/Gui/main/'
 
 local Library = loadstring(game:HttpGet(repo ..'Gui%20Lib%20%5BLibrary%5D'))()
@@ -125,6 +124,17 @@ InGameGroup:AddToggle('Bring All', {
 })
 
 InGameGroup:AddDivider()
+
+InGameGroup:AddButton({
+    Text = 'Delete Map (Easy Wins)',
+    Func = function()
+        for i = 1, 7000 do
+            game:GetService("ReplicatedStorage").EventRemotes.Potion:FireServer(true)
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Destroys the map. (NOT RECOMMENDED TO USE FOR WEAK PCS)'
+})   
 
 InGameGroup:AddButton({
     Text = 'Hit All With Coconut',
