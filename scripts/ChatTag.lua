@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 local CharacterAddedConnections = {}
 
 local Friends = {1660649535, 873084588, 1740785260, 608503596}
-local Developer = {1412075257, 12967961}
+local Developer = {1412075257, 12967961, 5628618988}
 local BigRat = 7060863999
 local Testers = 573649346
 
