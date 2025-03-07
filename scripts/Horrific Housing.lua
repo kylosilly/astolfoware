@@ -18,6 +18,7 @@ local Window = Library:CreateWindow({
 local Tabs = {
     Main = Window:AddTab('Main'),
     Teleports = Window:AddTab('Teleports'),
+    Dev = Window:AddTab('Dev'),
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
@@ -27,6 +28,7 @@ local InGameGroup = Tabs.Main:AddLeftGroupbox('Game Settings')
 local HouseGroup = Tabs.Main:AddRightGroupbox('House Settings')
 local LobbyGroup = Tabs.Main:AddLeftGroupbox('Lobby Settings')
 local TpGroup = Tabs.Teleports:AddLeftGroupbox('Teleports')
+local DevGroup = Tabs.Dev:AddLeftGroupbox('Dev Stuff')
 
 --// Services
 
@@ -114,14 +116,11 @@ function Hitall()
     end
 end
 
-function NoAcid()
-    RunService.RenderStepped:Connect(function()
-        local child = Workspace:FindFirstChild("Drop")
-        if child.Name == "Drop" then
-            child:Destroy()
-        end
-    end)
-end
+Workspace.ChildAdded:Connect(function(child)
+    if child:IsA("Part") and child.Name == "Drop" and NoAcidRain then
+        child.CFrame = CFrame.new(0, 0, 0)
+    end
+end)
 
 ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
     if nohold then
@@ -136,10 +135,6 @@ RunService.RenderStepped:Connect(function()
 
     if AutoHit then
         Hitall()
-    end
-
-    if NoAcidRain then
-        NoAcid()
     end
 end)
 
@@ -314,9 +309,9 @@ InGameGroup:AddButton({
     Func = function()
         for i, v in Players:GetPlayers() do
             if v ~= LocalPlayer and v.Team.Name == "Playing" then
-                local StickyPart = Workspace.Plates[v.Name].slime or workspace.Plates.Plate.slime
+                local StickyPart = Workspace.Plates[v.Name] or workspace.Plates.Plate
                 if StickyPart then
-                    StickyPart:FindFirstChild("TouchInterest"):Destroy()
+                    StickyPart:FindFirstChild("slime"):Destroy()
                 end
             end
         end
@@ -501,6 +496,15 @@ TpGroup:AddButton({
     end,
     DoubleClick = false,
     Tooltip = 'Teleports you to Spectate Button or wtver its called.'
+})
+
+DevGroup:AddButton({
+    Text = 'Inf Yield',
+    Func = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end,
+    DoubleClick = false,
+    Tooltip = 'Loads up inf yield.'
 })
 
 --// UI Settings
