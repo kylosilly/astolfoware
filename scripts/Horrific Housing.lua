@@ -4,18 +4,21 @@ local Library = loadstring(game:HttpGet(repo ..'Gui%20Lib%20%5BLibrary%5D'))()
 local ThemeManager = loadstring(game:HttpGet(repo ..'Gui%20Lib%20%5BThemeManager%5D'))()
 local SaveManager = loadstring(game:HttpGet(repo ..'Gui%20Lib%20%5BSaveManager%5D'))()
 
+Library:Notify('UwU Thanks For Using My Script 🐾🐾🐾 Mreow', 15)
+
 local Window = Library:CreateWindow({
     Title = 'Astolfo Ware | Made by @kylosilly',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
-    MenuFadeTime = 0.1
+    MenuFadeTime = 0.25
 })
 
 --// Tabs
 local Tabs = {
     Main = Window:AddTab('Main'),
     Teleports = Window:AddTab('Teleports'),
+    Dev = Window:AddTab('Dev'),
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
@@ -25,9 +28,11 @@ local InGameGroup = Tabs.Main:AddLeftGroupbox('Game Settings')
 local HouseGroup = Tabs.Main:AddRightGroupbox('House Settings')
 local LobbyGroup = Tabs.Main:AddLeftGroupbox('Lobby Settings')
 local TpGroup = Tabs.Teleports:AddLeftGroupbox('Teleports')
+local DevGroup = Tabs.Dev:AddLeftGroupbox('Dev Stuff')
 
 --// Services
 
+local ProximityPromptService = game:GetService("ProximityPromptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Market = game:GetService("MarketplaceService")
 local Info = Market:GetProductInfo(game.PlaceId)
@@ -56,8 +61,12 @@ local Ornament = ""
 local Furniture = ""
 local FurnitureSlot = "Furniture1"
 
+local NoAcidRain = false
 local NoBoomDmg = false
 local BringAll = false
+local AutoHit = false
+local nohold = false
+
 
 --// Main Script
 
@@ -93,9 +102,46 @@ function Bringall()
     end
 end
 
+function Hitall()
+    for i, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and LocalPlayer.Character:FindFirstChild("Coconut") and v.Character:FindFirstChild("HumanoidRootPart") and (v.Team.Name == "Playing" or (IncludeLobby and v.Team.Name == "Lobby")) then
+            local args = {
+                [1] = v.Character.HumanoidRootPart.Position,
+                [2] = v.Character.HumanoidRootPart,
+                [3] = 5
+            }
+            
+            LocalPlayer.Character:FindFirstChild("Coconut").throwEvent:FireServer(unpack(args))
+        end
+    end
+end
+
+function NoAcid()
+    RunService.RenderStepped:Connect(function()
+        local child = Workspace:FindFirstChild("Drop")
+        if child.Name == "Drop" then
+            child:Destroy()
+        end
+    end)
+end
+
+ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+    if nohold then
+        prompt.HoldDuration = 0
+    end
+end)
+
 RunService.RenderStepped:Connect(function()
     if BringAll then
         Bringall()
+    end
+
+    if AutoHit then
+        Hitall()
+    end
+
+    if NoAcidRain then
+        NoAcid()
     end
 end)
 
@@ -103,7 +149,7 @@ if hookmetamethod then
 InGameGroup:AddToggle('No Explosive Damage', {
     Text = 'No Explosive Damage',
     Default = false,
-    Tooltip = 'Removes explosive damage from rockets etc.',
+    Tooltip = 'Removes explosive damage from rockets etc. (Wont work for all)',
 
     Callback = function(Value)
         NoBoomDmg = Value
@@ -123,21 +169,61 @@ InGameGroup:AddToggle('Bring All', {
     end
 })
 
+InGameGroup:AddToggle('Farm', {
+    Text = 'Auto Hit All',
+    Default = false,
+    Tooltip = 'Automatically hits all players',
+
+    Callback = function(Value)
+        AutoHit = Value
+    end
+})
+
+InGameGroup:AddToggle('Inlude Lobby', {
+    Text = 'Include Lobby Players',
+    Default = false,
+    Tooltip = 'Includes players in lobby to hit',
+
+    Callback = function(Value)
+        IncludeLobby = Value
+    end
+})
+
+InGameGroup:AddToggle('No Hold Delay', {
+    Text = 'No Hold Delay',
+    Default = false,
+    Tooltip = 'Removes the hold delay from proximityprompts',
+
+    Callback = function(Value)
+        nohold = Value
+    end
+})
+
+InGameGroup:AddToggle('No Acid Rain', {
+    Text = 'No Acid Rain',
+    Default = false,
+    Tooltip = 'Removes Acid Rain',
+
+    Callback = function(Value)
+        NoAcidRain = Value
+    end
+})
+
 InGameGroup:AddDivider()
 
 InGameGroup:AddButton({
     Text = 'Delete Map (Easy Wins)',
     Func = function()
         for i = 1, 7000 do
-            game:GetService("ReplicatedStorage").EventRemotes.Potion:FireServer(true)
+            ReplicatedStorage.EventRemotes.Potion:FireServer(true)
         end
     end,
     DoubleClick = false,
     Tooltip = 'Destroys the map. (NOT RECOMMENDED TO USE FOR WEAK PCS)'
-})   
+})
 
 InGameGroup:AddButton({
-    Text = 'Hit All With Coconut',
+    Text = 'Hit All With Coconut (Killall)',
     Func = function()
         for i, v in pairs(Players:GetPlayers()) do
             if v ~= LocalPlayer and LocalPlayer.Character:FindFirstChild("Coconut") and v.Character:FindFirstChild("HumanoidRootPart") then
@@ -153,6 +239,30 @@ InGameGroup:AddButton({
     end,
     DoubleClick = false,
     Tooltip = 'Hits all players with coconut. (YOU GOTTA HOLD A COCONUT)'
+})
+
+InGameGroup:AddButton({
+    Text = 'Drink random potion',
+    Func = function()
+        ReplicatedStorage.EventRemotes.Potion:FireServer(true)
+    end,
+    DoubleClick = false,
+    Tooltip = 'Drinks a random potion. (Same as the delete map but only gives 1 potion)'
+})
+
+InGameGroup:AddButton({
+    Text = 'Expand Plate Size',
+    Func = function()
+        local Plates = Workspace.Plates[LocalPlayer.Name]
+        if Plates then
+            local Plate = Plates:FindFirstChild("Plate")
+            if Plate then
+                Plate.Size = Vector3.new(250, 1, 250)
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Expands plate size. (ONLY CHANGES OF YOURS SO IT DOSENT EXIST THAN IT WONT WORK)'
 })
 
 InGameGroup:AddButton({
@@ -174,7 +284,7 @@ InGameGroup:AddButton({
 InGameGroup:AddButton({
     Text = 'Remove Lava Kill Part',
     Func = function()
-        local LavaPlate = workspace.LavaPlate
+        local LavaPlate = Workspace.LavaPlate
         LavaPlate:FindFirstChild("TouchInterest"):Destroy()
     end,
     DoubleClick = false,
@@ -184,7 +294,7 @@ InGameGroup:AddButton({
 InGameGroup:AddButton({
     Text = 'Remove Spinner Kill Part',
     Func = function()
-        local Spinnnnnnnnnner = workspace.Spinner.Sweeper
+        local Spinnnnnnnnnner = Workspace.Spinner.Sweeper
         Spinnnnnnnnnner:FindFirstChild("TouchInterest"):Destroy()
     end,
     DoubleClick = false,
@@ -192,30 +302,30 @@ InGameGroup:AddButton({
 })
 
 InGameGroup:AddButton({
-    Text = 'Expand Plate Size',
-    Func = function()
-        local Plates = workspace.Plates[LocalPlayer.Name]
-        if Plates then
-            local Plate = Plates:FindFirstChild("Plate")
-            if Plate then
-                Plate.Size = Vector3.new(250, 1, 250)
-            end
-        end
-    end,
-    DoubleClick = false,
-    Tooltip = 'Expands plate size. (ONLY CHANGES OF YOURS SO IT DOSENT EXIST THAN IT WONT WORK)'
-})
-
-InGameGroup:AddButton({
     Text = 'Remove Acid Flood Kill Part',
     Func = function()
-        local KillPart = workspace.Kill
+        local KillPart = Workspace.Kill
         KillPart:FindFirstChild("TouchInterest"):Destroy()
     end,
     DoubleClick = false,
     Tooltip = 'Removes Acid Flood kill part.'
 })
 
+InGameGroup:AddButton({
+    Text = 'Remove Sticky Part',
+    Func = function()
+        for i, v in Players:GetPlayers() do
+            if v ~= LocalPlayer and v.Team.Name == "Playing" then
+                local StickyPart = Workspace.Plates[v.Name].slime or workspace.Plates.Plate.slime
+                if StickyPart then
+                    StickyPart:FindFirstChild("TouchInterest"):Destroy()
+                end
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Removes Sticky part from all plots.'
+})
 
 LobbyGroup:AddButton({
     Text = 'Spleef Lobby Tiles',
@@ -241,6 +351,23 @@ LobbyGroup:AddButton({
     end,
     DoubleClick = false,
     Tooltip = 'Claims all aviable rewards in obby.'
+})
+
+LobbyGroup:AddButton({
+    Text = 'Dupe Eggs',
+    Func = function()
+        local Eggs = LocalPlayer.Eggs
+        for i, v in next, Eggs:GetChildren() do
+            if v:IsA("NumberValue") then
+                for eggy = 1, 4 do
+                    v:Clone().Parent = Eggs
+                end
+                Library:Notify("Duplicated "..v.Name, 5)
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Dupes your owned eggs (You cant use the duped eggs they are only for crafting)'
 })
 
 HouseGroup:AddDropdown('Furniture Selector', {
@@ -378,6 +505,15 @@ TpGroup:AddButton({
     Tooltip = 'Teleports you to Spectate Button or wtver its called.'
 })
 
+DevGroup:AddButton({
+    Text = 'Inf Yield',
+    Func = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end,
+    DoubleClick = false,
+    Tooltip = 'Loads up inf yield.'
+})
+
 --// UI Settings
 
 local FrameTimer = tick()
@@ -400,13 +536,46 @@ local WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(
 end);
 
 local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
+local CreditsGroup = Tabs['UI Settings']:AddLeftGroupbox('Credits')
 
 MenuGroup:AddButton('Unload', function()
+    NoAcidRain = false
     NoBoomDmg = false
     BringAll = false
+    AutoHit = false
+    nohold = false
     WatermarkConnection:Disconnect()
     Library:Unload()
 end)
+
+CreditsGroup:AddLabel('@kylosilly: Who made the script', true)
+
+CreditsGroup:AddButton({
+    Text = 'Join our discord!',
+    Func = function()
+        setclipboard('https://discord.gg/frQv5QScXS')
+    end,
+    DoubleClick = false,
+    Tooltip = 'Join our official discord server.'
+})
+
+CreditsGroup:AddButton({
+    Text = 'Kylosilly Scriptblox',
+    Func = function()
+        setclipboard('https://scriptblox.com/u/CatBoy')
+    end,
+    DoubleClick = false,
+    Tooltip = 'My scriptblox profile'
+})
+
+CreditsGroup:AddButton({
+    Text = 'Kylosilly Github',
+    Func = function()
+        setclipboard('https://github.com/kylosilly')
+    end,
+    DoubleClick = false,
+    Tooltip = 'My github profile'
+})
 
 MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' })
 Library.ToggleKeybind = Options.MenuKeybind
@@ -415,7 +584,7 @@ SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
 ThemeManager:SetFolder('stolfo Ware')
-SaveManager:SetFolder('Astolfo Ware/Dead Rails Game')
+SaveManager:SetFolder('Astolfo Ware/Horrific Housing')
 SaveManager:BuildConfigSection(Tabs['UI Settings'])
 ThemeManager:ApplyToTab(Tabs['UI Settings'])
 SaveManager:LoadAutoloadConfig()
