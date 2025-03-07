@@ -28,7 +28,6 @@ local InGameGroup = Tabs.Main:AddLeftGroupbox('Game Settings')
 local HouseGroup = Tabs.Main:AddRightGroupbox('House Settings')
 local LobbyGroup = Tabs.Main:AddLeftGroupbox('Lobby Settings')
 local TpGroup = Tabs.Teleports:AddLeftGroupbox('Teleports')
-local DevGroup = Tabs.Dev:AddLeftGroupbox('Dev Stuff')
 
 --// Services
 
@@ -496,15 +495,6 @@ TpGroup:AddButton({
     end,
     DoubleClick = false,
     Tooltip = 'Teleports you to Spectate Button or wtver its called.'
-})
-
-DevGroup:AddButton({
-    Text = 'Inf Yield',
-    Func = function()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-    end,
-    DoubleClick = false,
-    Tooltip = 'Loads up inf yield.'
 })
 
 --// UI Settings
