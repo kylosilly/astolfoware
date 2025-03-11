@@ -17,8 +17,8 @@ local Window = Library:CreateWindow({
 --// Tabs
 local Tabs = {
     Main = Window:AddTab('Main'),
+    Misc = Window:AddTab('Misc'),
     Teleports = Window:AddTab('Teleports'),
-    Dev = Window:AddTab('Dev'),
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
@@ -27,12 +27,14 @@ local Tabs = {
 local InGameGroup = Tabs.Main:AddLeftGroupbox('Game Settings')
 local HouseGroup = Tabs.Main:AddRightGroupbox('House Settings')
 local LobbyGroup = Tabs.Main:AddLeftGroupbox('Lobby Settings')
+local MiscGroup = Tabs.Misc:AddLeftGroupbox('Misc Settings')
 local TpGroup = Tabs.Teleports:AddLeftGroupbox('Teleports')
 
 --// Services
 
 local ProximityPromptService = game:GetService("ProximityPromptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 local Market = game:GetService("MarketplaceService")
 local Info = Market:GetProductInfo(game.PlaceId)
 local RunService = game:GetService("RunService")
@@ -60,12 +62,11 @@ local Ornament = ""
 local Furniture = ""
 local FurnitureSlot = "Furniture1"
 
-local NoAcidRain = false
 local NoBoomDmg = false
 local BringAll = false
+local InfJump = false
 local AutoHit = false
 local nohold = false
-
 
 --// Main Script
 
@@ -115,9 +116,13 @@ function Hitall()
     end
 end
 
-Workspace.ChildAdded:Connect(function(child)
-    if child:IsA("Part") and child.Name == "Drop" and NoAcidRain then
-        child.CFrame = CFrame.new(0, 0, 0)
+RunService.RenderStepped:Connect(function()
+    if BringAll then
+        Bringall()
+    end
+
+    if AutoHit then
+        Hitall()
     end
 end)
 
@@ -127,13 +132,9 @@ ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
     end
 end)
 
-RunService.RenderStepped:Connect(function()
-    if BringAll then
-        Bringall()
-    end
-
-    if AutoHit then
-        Hitall()
+UserInputService.JumpRequest:Connect(function()
+    if InfJump then
+        LocalPlayer.Character.Humanoid:ChangeState("Jumping")
     end
 end)
 
@@ -188,16 +189,6 @@ InGameGroup:AddToggle('No Hold Delay', {
 
     Callback = function(Value)
         nohold = Value
-    end
-})
-
-InGameGroup:AddToggle('No Acid Rain', {
-    Text = 'No Acid Rain',
-    Default = false,
-    Tooltip = 'Removes Acid Rain',
-
-    Callback = function(Value)
-        NoAcidRain = Value
     end
 })
 
@@ -450,6 +441,15 @@ HouseGroup:AddButton({
     Tooltip = 'Changes the house color.'
 })
 
+MiscGroup:AddToggle('InfJump', {
+    Text = 'Infinite Jump',
+    Default = false,
+    Tooltip = 'Lets you jump forever',
+    Callback = function(Value)
+        InfJump = Value
+    end
+})
+
 TpGroup:AddButton({
     Text = 'Tp To Illumiati',
     Func = function()
@@ -522,9 +522,9 @@ local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
 local CreditsGroup = Tabs['UI Settings']:AddLeftGroupbox('Credits')
 
 MenuGroup:AddButton('Unload', function()
-    NoAcidRain = false
     NoBoomDmg = false
     BringAll = false
+    InfJump = false
     AutoHit = false
     nohold = false
     WatermarkConnection:Disconnect()
