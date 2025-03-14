@@ -69,7 +69,7 @@ local Join = LocalPlayer:GetAttribute("Join")
 
 --// Paths
 
-local cursed_objects = Workspace.Map.cursed_object
+local cursed_objects = Workspace.Map:FindFirstChild("cursed_object")
 local ghost_entity = Workspace.NPCs
 local Orb = Workspace.Dynamic.Evidence.Orbs
 local Fingerprints = Workspace.Dynamic.Evidence.Fingerprints
