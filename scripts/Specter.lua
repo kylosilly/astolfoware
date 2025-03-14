@@ -58,6 +58,7 @@ local cursed_object_name = false
 local cursed_object_highlight = false
 local bone_name = false
 local bone_highlight = false
+local MotionCheck = true
 
 local touch_distance = 5
 local sprint_speed = 1
@@ -78,6 +79,7 @@ local Blockers = Workspace.Map.Blockers
 local Closets = Workspace.Map.Closets
 local Doors = Workspace.Map.Doors
 local Bone = Workspace.Map
+local MotionGrid = Workspace.Dynamic.Evidence.MotionGrids
 
 --// Main Script
 
@@ -92,6 +94,41 @@ end
 
 function ChangeSprintSpeed()
     LocalPlayer:SetAttribute("Speed", sprint_speed)
+end
+
+local OrbLabel = game_group:AddLabel('Found Orbs: False')
+local FingerprintsLabel = game_group:AddLabel('Found Fingerprint: False')
+local EMFLabel = game_group:AddLabel('Last Seen EMF: None')
+local MotionLabel = game_group:AddLabel('Motion: None')
+
+EMF.ChildAdded:Connect(function(child)
+    if child:IsA("Part") then
+        EMFLabel:SetText("Last Seen EMF: " .. child.Name)
+    end
+end)
+
+Orb.ChildAdded:Connect(function(child)
+    if child:IsA("Part") then
+        OrbLabel:SetText("Found Orbs: True")
+    end
+end)
+
+Fingerprints.ChildAdded:Connect(function(child)
+    if child:IsA("Part") then
+        FingerprintsLabel:SetText("Found Fingerprint: True")
+    end
+end)
+
+function CheckMotion()
+    for i, v in pairs(MotionGrid:GetDescendants()) do
+        if v:IsA("Part") then
+            if v.Color == Color3.fromRGB(252, 52, 52) then
+                MotionLabel:SetText("Motion: True")
+            elseif v.BrickColor == BrickColor.new("Toothpaste") then
+                MotionLabel:SetText("Motion: False")
+            end
+        end
+    end
 end
 
 ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
@@ -277,27 +314,9 @@ local Connections = RunService.RenderStepped:Connect(function()
     if bone_highlight then
         BoneHighlight()
     end
-end)
 
-local OrbLabel = game_group:AddLabel('Found Orbs: False')
-local FingerprintsLabel = game_group:AddLabel('Found Fingerprint: False')
-local EMFLabel = game_group:AddLabel('Last Seen EMF: None')
-
-EMF.ChildAdded:Connect(function(child)
-    if child:IsA("Part") then
-        EMFLabel:SetText("Last Seen EMF: " .. child.Name)
-    end
-end)
-
-Orb.ChildAdded:Connect(function(child)
-    if child:IsA("Part") then
-        OrbLabel:SetText("Found Orbs: True")
-    end
-end)
-
-Fingerprints.ChildAdded:Connect(function(child)
-    if child:IsA("Part") then
-        FingerprintsLabel:SetText("Found Fingerprint: True")
+    if MotionCheck then
+        CheckMotion()
     end
 end)
 
