@@ -50,7 +50,6 @@ local Stats = game:GetService("Stats")
 local no_hold_delay = false
 local anti_touch = false
 local sprint_change = false
-local inf_jump = false
 local show_ghost = false
 local highlight_ghost = false
 local ghost_name = false
@@ -58,6 +57,7 @@ local cursed_object_name = false
 local cursed_object_highlight = false
 local bone_name = false
 local bone_highlight = false
+local inf_stamina = false
 local MotionCheck = true
 
 local touch_distance = 5
@@ -576,7 +576,6 @@ menu_group:AddButton('Unload', function()
     no_hold_delay = false
     anti_touch = false
     sprint_change = false
-    inf_jump = false
     show_ghost = false
     highlight_ghost = false
     ghost_name = false
@@ -584,6 +583,7 @@ menu_group:AddButton('Unload', function()
     cursed_object_highlight = false
     bone_name = false
     bone_highlight = false
+    inf_stamina = false
 
     for i, v in next, Workspace:GetDescendants() do
         if v.Name == "Esp BillBoard" or v.Name == "Highlight" then
