@@ -20,6 +20,7 @@ Library:Notify('Script made by @kylosilly the script is still in development and
 local Tabs = {
     Main = Window:AddTab('Main'),
     Esp = Window:AddTab('Esp'),
+    World = Window:AddTab('World'),
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
@@ -29,6 +30,7 @@ local game_group = Tabs.Main:AddLeftGroupbox('Game Settings')
 local player_group = Tabs.Main:AddRightGroupbox('Player Settings')
 local ghost_esp_group = Tabs.Esp:AddLeftGroupbox('Ghost Esp Settings')
 local item_esp_group = Tabs.Esp:AddRightGroupbox('Item Esp Settings')
+local world_group = Tabs.World:AddLeftGroupbox('World Settings')
 local menu_group = Tabs['UI Settings']:AddLeftGroupbox('Menu')
 local credits_group = Tabs['UI Settings']:AddRightGroupbox('Credits')
 
@@ -41,6 +43,7 @@ local Market = game:GetService("MarketplaceService")
 local Info = Market:GetProductInfo(game.PlaceId)
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Stats = game:GetService("Stats")
@@ -50,6 +53,7 @@ local Stats = game:GetService("Stats")
 local no_hold_delay = false
 local anti_touch = false
 local sprint_change = false
+local noclip = false
 local show_ghost = false
 local highlight_ghost = false
 local ghost_name = false
@@ -58,7 +62,8 @@ local cursed_object_highlight = false
 local bone_name = false
 local bone_highlight = false
 local inf_stamina = false
-local MotionCheck = true
+local jump_enabled = false
+local full_bright = false
 
 local touch_distance = 5
 local sprint_speed = 1
@@ -262,6 +267,13 @@ function BoneHighlight()
     end
 end
 
+function NoClip()
+    LocalPlayer.Character.HumanoidRootPart.CanCollide = false
+    LocalPlayer.Character.UpperTorso.CanCollide = false
+    LocalPlayer.Character.LowerTorso.CanCollide = false
+    LocalPlayer.Character.Head.CanCollide = false
+end
+
 function PreventTouch()
     for i, v in pairs(ghost_entity:GetChildren()) do
         if v:IsA("Model") then
@@ -315,8 +327,10 @@ local Connections = RunService.RenderStepped:Connect(function()
         BoneHighlight()
     end
 
-    if MotionCheck then
-        CheckMotion()
+    CheckMotion()
+
+    if noclip then
+        NoClip()
     end
 end)
 
@@ -385,6 +399,35 @@ player_group:AddSlider('sprint speed value', {
 
     Callback = function(Value)
         sprint_speed = Value
+    end
+})
+
+player_group:AddDivider()
+
+player_group:AddToggle('Noclip', {
+    Text = 'Noclip',
+    Default = false,
+    Tooltip = 'Lets you go through walls',
+
+    Callback = function(Value)
+        noclip = Value
+    end
+})
+
+player_group:AddToggle('Enable Jump', {
+    Text = 'Enable Jumping',
+    Default = false,
+    Tooltip = 'Lets you jump',
+
+    Callback = function(Value)
+        jump_enabled = Value
+        if Value then
+            LocalPlayer.Character.Humanoid.JumpPower = 30
+            LocalPlayer.Character.Humanoid.JumpHeight = 7.2
+        else
+            LocalPlayer.Character.Humanoid.JumpPower = 0
+            LocalPlayer.Character.Humanoid.JumpHeight = 0
+        end
     end
 })
 
@@ -551,6 +594,21 @@ item_esp_group:AddToggle('Bone Highlight', {
     end
 })
 
+world_group:AddToggle('Full Bright', {
+    Text = 'Full Bright',
+    Default = false,
+    Tooltip = 'Enables Full Bright',
+
+    Callback = function(Value)
+        full_bright = Value
+        if Value then
+            Lighting.ClockTime = 12
+        else
+            Lighting.ClockTime = 0
+        end
+    end
+})
+
 --// UI Settings
 
 local FrameTimer = tick()
@@ -584,6 +642,9 @@ menu_group:AddButton('Unload', function()
     bone_name = false
     bone_highlight = false
     inf_stamina = false
+    noclip = false
+    jump_enabled = false
+    full_bright = false
 
     for i, v in next, Workspace:GetDescendants() do
         if v.Name == "Esp BillBoard" or v.Name == "Highlight" then
