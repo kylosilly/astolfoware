@@ -54,6 +54,8 @@ local no_hold_delay = false
 local anti_touch = false
 local sprint_change = false
 local noclip = false
+local third_person = false
+local inf_jump = false
 local show_ghost = false
 local highlight_ghost = false
 local ghost_name = false
@@ -65,12 +67,13 @@ local inf_stamina = false
 local jump_enabled = false
 local full_bright = false
 
-local touch_distance = 5
+local touch_distance = 6
 local sprint_speed = 1
 
 local Device = LocalPlayer:GetAttribute("Device")
 local GID = LocalPlayer:GetAttribute("GID")
 local Join = LocalPlayer:GetAttribute("Join")
+local LastPos = LocalPlayer.Character.HumanoidRootPart.CFrame
 
 --// Paths
 
@@ -85,10 +88,11 @@ local Closets = Workspace.Map.Closets
 local Doors = Workspace.Map.Doors
 local Bone = Workspace.Map
 local MotionGrid = Workspace.Dynamic.Evidence.MotionGrids
+local FuseBox = Workspace.Map.Fusebox.Fusebox
 
 --// Main Script
 
-print("Enjoy the script!" .. LocalPlayer.DisplayName)
+print("Dont worry this info isnt gonna harm you in anyways that your seeings its just for debugging!")
 print("Device: " .. Device)
 print("LocalPlayer GID: " .. GID)
 print("Join Time: " .. os.date("%Y-%m-%d %H:%M:%S", Join))
@@ -101,10 +105,11 @@ function ChangeSprintSpeed()
     LocalPlayer:SetAttribute("Speed", sprint_speed)
 end
 
-local OrbLabel = game_group:AddLabel('Found Orbs: False')
-local FingerprintsLabel = game_group:AddLabel('Found Fingerprint: False')
+local OrbLabel = game_group:AddLabel('Orbs: Not Found')
+local FingerprintsLabel = game_group:AddLabel('Fingerprint: Not Found')
 local EMFLabel = game_group:AddLabel('Last Seen EMF: None')
-local MotionLabel = game_group:AddLabel('Motion: None')
+local EMFFiveLabel = game_group:AddLabel('EMF 5: Not Found')
+local MotionLabel = game_group:AddLabel('Motion: Not Found')
 
 EMF.ChildAdded:Connect(function(child)
     if child:IsA("Part") then
@@ -112,15 +117,21 @@ EMF.ChildAdded:Connect(function(child)
     end
 end)
 
+EMF.ChildAdded:Connect(function(child)
+    if child:IsA("Part") and child.Name == "EMF5" then
+        EMFFiveLabel:SetText("EMF 5: Yes")
+    end
+end)
+
 Orb.ChildAdded:Connect(function(child)
     if child:IsA("Part") then
-        OrbLabel:SetText("Found Orbs: True")
+        OrbLabel:SetText("Orbs: Yes")
     end
 end)
 
 Fingerprints.ChildAdded:Connect(function(child)
     if child:IsA("Part") then
-        FingerprintsLabel:SetText("Found Fingerprint: True")
+        FingerprintsLabel:SetText("Fingerprint: Yes")
     end
 end)
 
@@ -128,9 +139,9 @@ function CheckMotion()
     for i, v in pairs(MotionGrid:GetDescendants()) do
         if v:IsA("Part") then
             if v.Color == Color3.fromRGB(252, 52, 52) then
-                MotionLabel:SetText("Motion: True")
+                MotionLabel:SetText("Motion: Yes")
             elseif v.BrickColor == BrickColor.new("Toothpaste") then
-                MotionLabel:SetText("Motion: False")
+                MotionLabel:SetText("Motion: No")
             end
         end
     end
@@ -139,6 +150,12 @@ end
 ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
     if no_hold_delay then
         prompt.HoldDuration = 0
+    end
+end)
+
+UserInputService.JumpRequest:Connect(function()
+    if jump_enabled then
+        LocalPlayer.Character.Humanoid:ChangeState("Jumping")
     end
 end)
 
@@ -358,8 +375,8 @@ game_group:AddToggle('Anti Ghost Touch', {
 
 game_group:AddSlider('Anti Touch Distance', {
     Text = 'Anti Touch Distance',
-    Default = 5,
-    Min = 5,
+    Default = 6,
+    Min = 6,
     Max = 12,
     Rounding = 1,
     Compact = false,
@@ -368,6 +385,55 @@ game_group:AddSlider('Anti Touch Distance', {
         touch_distance = Value
     end
 })
+
+game_group:AddDivider()
+
+game_group:AddButton({
+    Text = 'Collect Bone',
+
+    Func = function()
+        for i, v in next, Bone:GetDescendants() do
+            if v:IsA("ProximityPrompt") and v.Name == "Bone" then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = v.Parent.CFrame + Vector3.new(0, 5, 0)
+                task.wait(0.5)
+                fireproximityprompt(v)
+                task.wait(0.5)
+                LocalPlayer.Character.HumanoidRootPart.CFrame = LastPos
+                Library:Notify("Collected bone.")
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Collects the bone'
+})
+
+game_group:AddButton({
+    Text = 'Enable Power',
+
+    Func = function()
+        for i, v in next, FuseBox:GetChildren() do
+            if v:IsA("ProximityPrompt") and v.name == "FuseboxPrompt" then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = v.Parent.CFrame
+                task.wait(0.2)
+                fireproximityprompt(v)
+                task.wait(0.2)
+                LocalPlayer.Character.HumanoidRootPart.CFrame = LastPos
+                local FuseBoxToggles = Workspace.Map.Fusebox
+                if FuseBoxToggles then
+                    if FuseBoxToggles:FindFirstChild("On").Transparency == 0 then
+                        Library:Notify("Turned off power box.")
+                    else
+                        if FuseBoxToggles:FindFirstChild("Off").Transparency == 0 then
+                            Library:Notify("Turned on power box.")
+                        end
+                    end
+                end
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Turns on/off the power box'
+})    
 
 player_group:AddToggle('inf stamina', {
     Text = 'Inf Stamina',
@@ -427,6 +493,33 @@ player_group:AddToggle('Enable Jump', {
         else
             LocalPlayer.Character.Humanoid.JumpPower = 0
             LocalPlayer.Character.Humanoid.JumpHeight = 0
+        end
+    end
+})
+
+player_group:AddToggle('Inf Jump', {
+    Text = 'Inf Jump',
+    Default = false,
+    Tooltip = 'Lets you jump forever',
+
+    Callback = function(Value)
+        inf_jump = Value
+    end
+})
+
+player_group:AddDivider()
+
+player_group:AddToggle('3rd person', {
+    Text = '3rd Person',
+    Default = false,
+    Tooltip = 'idk why i really added it bc its uselss',
+
+    Callback = function(Value)
+        third_person = Value
+        if Value then
+            LocalPlayer.Character.Humanoid.CameraOffset = Vector3.new(0, 1, 2)
+        else
+            LocalPlayer.Character.Humanoid.CameraOffset = Vector3.new(0, 0, -1)
         end
     end
 })
@@ -603,8 +696,10 @@ world_group:AddToggle('Full Bright', {
         full_bright = Value
         if Value then
             Lighting.ClockTime = 12
+            Lighting.GlobalShadows = false
         else
             Lighting.ClockTime = 0
+            Lighting.GlobalShadows = true
         end
     end
 })
@@ -645,12 +740,18 @@ menu_group:AddButton('Unload', function()
     noclip = false
     jump_enabled = false
     full_bright = false
+    inf_jump = false
+    third_person = false
 
     for i, v in next, Workspace:GetDescendants() do
         if v.Name == "Esp BillBoard" or v.Name == "Highlight" then
             v:Destroy()
         end
     end
+
+    Lighting.ClockTime = 0
+    Lighting.GlobalShadows = true
+    LocalPlayer.Character.Humanoid.CameraOffset = Vector3.new(0, 0, -1)
 
     WatermarkConnection:Disconnect()
     Connections:Disconnect()
@@ -692,8 +793,8 @@ ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
-ThemeManager:SetFolder('stolfo Ware')
-SaveManager:SetFolder('Astolfo Ware/Horrific Housing')
+ThemeManager:SetFolder('Astolfo Ware')
+SaveManager:SetFolder('Astolfo Ware/Specter')
 SaveManager:BuildConfigSection(Tabs['UI Settings'])
 ThemeManager:ApplyToTab(Tabs['UI Settings'])
 SaveManager:LoadAutoloadConfig()
