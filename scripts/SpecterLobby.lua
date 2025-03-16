@@ -96,8 +96,8 @@ local avaible_difficulties = {}
 --// Variables
 
 local selected_crate = ""
-local selected_map = ""
-local selected_difficulty = ""
+local selected_map = "Cargo"
+local selected_difficulty = "Insanity"
 
 --// Main Script
 
@@ -176,7 +176,7 @@ lobby_group:AddDivider()
 
 lobby_group:AddDropdown('map selector', {
     Values = avaible_maps,
-    Default = "",
+    Default = "Cargo",
     Multi = false,
 
     Text = 'Select Map',
@@ -204,7 +204,7 @@ lobby_group:AddDivider()
 
 lobby_group:AddDropdown('difficulty selector', {
     Values = avaible_difficulties,
-    Default = "",
+    Default = "Insanity",
     Multi = false,
 
     Text = 'Select Difficulty',
