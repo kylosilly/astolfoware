@@ -28,7 +28,10 @@ local game_group = Tabs.Main:AddLeftGroupbox('Game Settings')
 local player_group = Tabs.Main:AddRightGroupbox('Player Settings')
 local ghost_esp_group = Tabs.Esp:AddLeftGroupbox('Ghost Esp Settings')
 local item_esp_group = Tabs.Esp:AddRightGroupbox('Item Esp Settings')
+local player_esp_group = Tabs.Esp:AddLeftGroupbox('Player Esp Settings')
 local EMF_esp_group = Tabs.Esp:AddRightGroupbox('EMF Esp Settings')
+local closet_esp_group = Tabs.Esp:AddLeftGroupbox('Closet Esp Settings')
+local equipment_esp_group = Tabs.Esp:AddRightGroupbox('Dropped Equipment Esp Settings')
 local world_group = Tabs.World:AddLeftGroupbox('World Settings')
 local menu_group = Tabs['UI Settings']:AddLeftGroupbox('Menu')
 local credits_group = Tabs['UI Settings']:AddRightGroupbox('Credits')
@@ -46,6 +49,7 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Stats = game:GetService("Stats")
+local Cam = Workspace.CurrentCamera
 
 --// Variables
 
@@ -67,6 +71,12 @@ local jump_enabled = false
 local full_bright = false
 local emf_name = false
 local ambient_changer = false
+local player_name = false
+local player_highlight = false
+local closet_name = false
+local closet_highlight = false
+local equipment_name = false
+local equipment_highlight = false
 
 local touch_distance = 7
 local sprint_speed = 1
@@ -88,7 +98,8 @@ local Closets = Workspace.Map.Closets
 local Bone = Workspace.Map
 local MotionGrid = Workspace.Dynamic.Evidence.MotionGrids
 local FuseBox = Workspace.Map.Fusebox.Fusebox
-local Rooms = workspace.Map.Rooms
+local Rooms = Workspace.Map.Rooms
+local dropped_equipment = Workspace.Equipment
 
 --// Main Script
 
@@ -110,6 +121,7 @@ local FingerprintsLabel = game_group:AddLabel('Fingerprint: Not Found')
 local OrbLabel = game_group:AddLabel('Orbs: Not Found')
 local EMFLabel = game_group:AddLabel('Last Seen EMF: None')
 local MotionLabel = game_group:AddLabel('Motion: Not Found')
+local FreezeLabel = game_group:AddLabel('Freezing: Not Found')
 local GhostRoomLabel = game_group:AddLabel('Current Ghost Room: Not Found')
 
 EMF.ChildAdded:Connect(function(child)
@@ -219,7 +231,7 @@ function CursedObjectName()
             BillboardGui.Name = "Esp BillBoard"
             BillboardGui.AlwaysOnTop = true
             BillboardGui.Size = UDim2.new(0, 200, 0, 50)
-            BillboardGui.StudsOffset = Vector3.new(0, 0, 0)
+            BillboardGui.StudsOffset = Vector3.new(0, 2, 0)
 
             TextLabel.Parent = BillboardGui
             TextLabel.Name = "Name Esp"
@@ -257,7 +269,7 @@ function BoneName()
             BillboardGui.Name = "Esp BillBoard"
             BillboardGui.AlwaysOnTop = true
             BillboardGui.Size = UDim2.new(0, 200, 0, 50)
-            BillboardGui.StudsOffset = Vector3.new(0, 0, 0)
+            BillboardGui.StudsOffset = Vector3.new(0, 2, 0)
 
             TextLabel.Parent = BillboardGui
             TextLabel.Name = "Name Esp"
@@ -308,6 +320,136 @@ function CheckEMFS()
             TextLabel.BackgroundTransparency = 1
             TextLabel.TextStrokeTransparency = 0
             TextLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        end
+    end
+end
+
+function PlayerName()
+    for i, v in next, Players:GetPlayers() do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Humanoid") then
+            local Humanoid = v.Character:FindFirstChild("Humanoid")
+            
+            if Humanoid.Health <= 0 then
+                if v.Character.Head:FindFirstChild("Esp BillBoard") then
+                    v.Character.Head:FindFirstChild("Esp BillBoard"):Destroy()
+                end
+            elseif player_name and not v.Character.Head:FindFirstChild("Esp BillBoard") then
+                local BillboardGui = Instance.new("BillboardGui")
+                local TextLabel = Instance.new("TextLabel")
+    
+                BillboardGui.Parent = v.Character.Head
+                BillboardGui.Name = "Esp BillBoard"
+                BillboardGui.AlwaysOnTop = true
+                BillboardGui.Size = UDim2.new(0, 200, 0, 50)
+                BillboardGui.StudsOffset = Vector3.new(0, 5, 0)
+    
+                TextLabel.Parent = BillboardGui
+                TextLabel.Name = "Name Esp"
+                TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                TextLabel.Size = UDim2.new(1, 0, 1, 0)
+                TextLabel.Text = v.DisplayName
+                TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                TextLabel.TextSize = 14
+                TextLabel.Font = "SourceSansBold"
+                TextLabel.BackgroundTransparency = 1
+                TextLabel.TextStrokeTransparency = 0
+                TextLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+            end
+        end
+    end
+end
+
+function PlayerHighlight()
+    for i, v in next, Players:GetPlayers() do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Humanoid") then
+            local Humanoid = v.Character:FindFirstChild("Humanoid")
+
+            if Humanoid.Health <= 0 then
+                if v.Character:FindFirstChild("Highlight") then
+                    v.Character:FindFirstChild("Highlight"):Destroy()
+                end
+            elseif not v.Character:FindFirstChild("Highlight") then
+                local Highlight = Instance.new("Highlight")
+                Highlight.Parent = v.Character
+                Highlight.FillColor = player_highlight_color
+                Highlight.OutlineColor = player_highlight_color
+            end
+        end
+    end
+end
+
+function ClosetName()
+    for i, v in next, Closets:GetChildren() do
+        if v:IsA("Model") and not v:FindFirstChild("Esp BillBoard") then
+            local BillboardGui = Instance.new("BillboardGui")
+            local TextLabel = Instance.new("TextLabel")
+    
+            BillboardGui.Parent = v
+            BillboardGui.Name = "Esp BillBoard"
+            BillboardGui.AlwaysOnTop = true
+            BillboardGui.Size = UDim2.new(0, 200, 0, 50)
+            BillboardGui.StudsOffset = Vector3.new(0, 5, 0)
+    
+            TextLabel.Parent = BillboardGui
+            TextLabel.Name = "Name Esp"
+            TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            TextLabel.Size = UDim2.new(1, 0, 1, 0)
+            TextLabel.Text = v.Name
+            TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TextLabel.TextSize = 14
+            TextLabel.Font = "SourceSansBold"
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.TextStrokeTransparency = 0
+            TextLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        end
+    end
+end
+
+function ClosetHighlight()
+    for i, v in next, Closets:GetChildren() do
+        if v:IsA("Model") and not v:FindFirstChild("Highlight") then
+            local Highlight = Instance.new("Highlight")
+            Highlight.Parent = v
+            Highlight.FillColor = closet_highlight_color
+            Highlight.OutlineColor = closet_highlight_color
+        end
+    end
+end
+
+function EquipmentName()
+    for i, v in next, dropped_equipment:GetChildren() do
+        if v:IsA("Model") and not v:FindFirstChild("Esp BillBoard") then
+            local BillboardGui = Instance.new("BillboardGui")
+            local TextLabel = Instance.new("TextLabel")
+    
+            BillboardGui.Parent = v
+            BillboardGui.Name = "Esp BillBoard"
+            BillboardGui.AlwaysOnTop = true
+            BillboardGui.Size = UDim2.new(0, 200, 0, 50)
+            BillboardGui.StudsOffset = Vector3.new(0, 2, 0)
+    
+            TextLabel.Parent = BillboardGui
+            TextLabel.Name = "Name Esp"
+            TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            TextLabel.Size = UDim2.new(1, 0, 1, 0)
+            TextLabel.Text = v.Name
+            TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TextLabel.TextSize = 14
+            TextLabel.Font = "SourceSansBold"
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.TextStrokeTransparency = 0
+            TextLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        end
+    end
+end
+
+function EquipmentHighlight()
+    for i, v in next, dropped_equipment:GetChildren() do
+        if v:IsA("Model") and not v:FindFirstChild("Highlight") then
+            local Highlight = Instance.new("Highlight")
+            Highlight.Parent = v
+            Highlight.FillColor = equipment_highlight_color
+            Highlight.OutlineColor = equipment_highlight_color
         end
     end
 end
@@ -380,6 +522,30 @@ local Connections = RunService.RenderStepped:Connect(function()
 
     if emf_name then
         CheckEMFS()
+    end
+
+    if player_name then
+        PlayerName()
+    end
+
+    if player_highlight then
+        PlayerHighlight()
+    end
+
+    if closet_name then
+        ClosetName()
+    end
+
+    if closet_highlight then
+        ClosetHighlight()
+    end
+
+    if equipment_name then
+        EquipmentName()
+    end
+
+    if equipment_highlight then
+        EquipmentHighlight()
     end
 end)
 
@@ -475,10 +641,16 @@ game_group:AddButton({
     Text = 'Find Ghost Room',
 
     Func = function()
-        local EMF = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("EquipmentModel") and LocalPlayer.Character.EquipmentModel:FindFirstChild("2")
-        
-        if not EMF then
+        local EMFTool = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("EquipmentModel") and LocalPlayer.Character.EquipmentModel:FindFirstChild("2")
+        local EMF = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("EquipmentModel") and LocalPlayer.Character.EquipmentModel:FindFirstChild("1")
+
+        if not EMFTool then
             Library:Notify("Equip EMF reader first!")
+            return
+        end
+
+        if not EMF or EMF.Color ~= Color3.fromRGB(52, 142, 64) then
+            Library:Notify("Turn on EMF first!")
             return
         end
 
@@ -488,12 +660,13 @@ game_group:AddButton({
                 
                 if Hitbox then
                     LocalPlayer.Character.HumanoidRootPart.CFrame = Hitbox.CFrame
-                    task.wait(1)
+                    Cam.CFrame = Hitbox.CFrame
+                    task.wait(2)
                     
-                    if EMF.Color == Color3.fromRGB(131, 156, 49) then
+                    if EMFTool.Color == Color3.fromRGB(131, 156, 49) then
                         Library:Notify("Found Ghost Room: " .. room.Name)
                         GhostRoomLabel:SetText("Current Ghost Room: " .. room.Name)
-                        GhostRoom = room:FindFirstChild("Hitbox").CFrame
+                        GhostRoom = Hitbox.CFrame
                         return
                     end
                 end
@@ -518,6 +691,42 @@ game_group:AddButton({
     DoubleClick = false,
     Tooltip = 'Teleports you to the ghost room'
 })
+
+game_group:AddButton({
+    Text = 'Check Freezing Temp',
+
+    Func = function()
+        local Freezing = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("EquipmentModel") and LocalPlayer.Character.EquipmentModel:FindFirstChild("Temp") and LocalPlayer.Character.EquipmentModel.Temp:FindFirstChild("SurfaceGui") and LocalPlayer.Character.EquipmentModel.Temp.SurfaceGui:FindFirstChild("TextLabel")
+
+        if not Freezing then
+            Library:Notify("Equip freezing temp thingy idk")
+            return
+        end
+
+        if GhostRoom then
+            local OriginalPos = LocalPlayer.Character.HumanoidRootPart.CFrame
+            LocalPlayer.Character.HumanoidRootPart.CFrame = GhostRoom
+            task.wait(10)
+
+            local Tempeture = tonumber(Freezing.Text:match("[-%d]+"))
+
+            if Tempeture and Tempeture < 0 then
+                FreezeLabel:SetText("Freezing Temp: Yes")
+            else
+                FreezeLabel:SetText("Freezing Temp: No")
+            end
+
+            LocalPlayer.Character.HumanoidRootPart.CFrame = OriginalPos
+        else
+            Library:Notify("Ghost room not found.")
+        end
+    end,
+
+    DoubleClick = false,
+    Tooltip = 'Checks if frozen check'
+})
+
+game_group:AddDivider()
 
 game_group:AddButton({
     Text = 'Tp To Van',
@@ -798,6 +1007,156 @@ EMF_esp_group:AddToggle('Emfs idk', {
     end
 })
 
+player_esp_group:AddToggle('Player Name Esp', {
+    Text = 'Name Esp',
+    Default = false,
+    Tooltip = 'Enables name esp for players',
+
+    Callback = function(Value)
+        player_name = Value
+        if not Value then
+            for _, v in pairs(Players:GetPlayers()) do
+                if v.Character and v.Character:FindFirstChild("Head") then
+                    local espbillboard = v.Character.Head:FindFirstChild("Esp BillBoard")
+                    if espbillboard then
+                        espbillboard:Destroy()
+                    end
+                end
+            end
+        end
+    end
+})
+
+player_esp_group:AddToggle('Player Highlight', {
+    Text = 'Highlight',
+    Default = false,
+    Tooltip = 'Highlights players',
+
+    Callback = function(Value)
+        player_highlight = Value
+        if not Value then
+            for _, v in pairs(Players:GetPlayers()) do
+                if v.Character then
+                    local highlight = v.Character:FindFirstChild("Highlight")
+                    if highlight then
+                        highlight:Destroy()
+                    end
+                end
+            end
+        end
+    end
+}):AddColorPicker('Color', {
+    Default = Color3.fromRGB(255, 255, 255),
+    Title = 'Color Picker For Highlight',
+
+    Callback = function(Value)
+        player_highlight_color = Value
+        for _, v in pairs(Players:GetPlayers()) do
+            if v.Character then
+                local highlight = v.Character:FindFirstChild("Highlight")
+                if highlight then
+                    highlight.FillColor = Value
+                    highlight.OutlineColor = Value
+                end
+            end
+        end
+    end
+})
+
+closet_esp_group:AddToggle('Closet Esp Name', {
+    Text = 'Closet Esp Name',
+    Default = false,
+    Tooltip = 'Enables names to all closets',
+
+    Callback = function(Value)
+        closet_name = Value
+        if not Value then
+            for i, v in next, Closets:GetChildren() do
+                if v:IsA("Model") and v:FindFirstChild("Esp BillBoard") then
+                    v:FindFirstChild("Esp BillBoard"):Destroy()
+                end
+            end
+        end
+    end
+})
+
+closet_esp_group:AddToggle('Closet Esp Highlight', {
+    Text = 'Closet Esp Highlight',
+    Default = false,
+    Tooltip = 'Highlights closets',
+
+    Callback = function(Value)
+        closet_highlight = Value
+        if not Value then
+            for i, v in next, Closets:GetChildren() do
+                if v:IsA("Model") and v:FindFirstChild("Highlight") then
+                    v.Highlight:Destroy()
+                end
+            end
+        end
+    end
+}):AddColorPicker('Color', {
+    Default = Color3.fromRGB(255, 255, 255),
+    Title = 'Color Picker For Highlight',
+
+    Callback = function(Value)
+        closet_highlight_color = Value
+        for i, v in next, Closets:GetChildren() do
+            if v:IsA("Model") and v:FindFirstChild("Highlight") then
+                v.Highlight.FillColor = Value
+                v.Highlight.OutlineColor = Value
+            end
+        end
+    end
+})
+
+equipment_esp_group:AddToggle('Equipment Esp Name', {
+    Text = 'Dropped Equipment Name',
+    Default = false,
+    Tooltip = 'Enables names to all equipment',
+
+    Callback = function(Value)
+        equipment_name = Value
+        if not Value then
+            for i, v in next, dropped_equipment:GetChildren() do
+                if v:IsA("Model") and v:FindFirstChild("Esp BillBoard") then
+                    v:FindFirstChild("Esp BillBoard"):Destroy()
+                end
+            end
+        end
+    end
+})
+
+equipment_esp_group:AddToggle('Equipment Esp Highlight', {
+    Text = 'Dropped Equipment Highlight',
+    Default = false,
+    Tooltip = 'Highlights equipment',
+
+    Callback = function(Value)
+        equipment_highlight = Value
+        if not Value then
+            for i, v in next, dropped_equipment:GetChildren() do
+                if v:IsA("Model") and v:FindFirstChild("Highlight") then
+                    v.Highlight:Destroy()
+                end
+            end
+        end
+    end
+}):AddColorPicker('Color', {
+    Default = Color3.fromRGB(255, 255, 255),
+    Title = 'Color Picker For Highlight',
+
+    Callback = function(Value)
+        equipment_highlight_color = Value
+        for i, v in next, dropped_equipment:GetChildren() do
+            if v:IsA("Model") and v:FindFirstChild("Highlight") then
+                v.Highlight.FillColor = Value
+                v.Highlight.OutlineColor = Value
+            end
+        end
+    end
+})
+
 world_group:AddToggle('Full Bright', {
     Text = 'Full Bright',
     Default = false,
@@ -889,6 +1248,12 @@ menu_group:AddButton('Unload', function()
     third_person = false
     emf_name = false
     ambient_changer = false
+    player_name = false
+    player_highlight = false
+    closet_name = false
+    closet_highlight = false
+    equipment_name = false
+    equipment_highlight = false
 
     for i, v in next, Workspace:GetDescendants() do
         if v.Name == "Esp BillBoard" or v.Name == "Highlight" then
