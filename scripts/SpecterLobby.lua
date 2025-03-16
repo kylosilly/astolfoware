@@ -281,7 +281,7 @@ misc_group:AddButton({
         ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("WheelService"):WaitForChild("RF"):WaitForChild("Spin"):InvokeServer()
     end,
     DoubleClick = false,
-    Tooltip = 'teleports you to specter hub'
+    Tooltip = 'Spins daily wheel'
 })
 
 --// UI Settings
