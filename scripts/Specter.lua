@@ -13,8 +13,6 @@ local Window = Library:CreateWindow({
     MenuFadeTime = 0.2
 })
 
-Library:Notify('Script made by @kylosilly the script is still in development and will get more features soon.', 15)
-
 --// Tabs
 
 local Tabs = {
@@ -30,6 +28,7 @@ local game_group = Tabs.Main:AddLeftGroupbox('Game Settings')
 local player_group = Tabs.Main:AddRightGroupbox('Player Settings')
 local ghost_esp_group = Tabs.Esp:AddLeftGroupbox('Ghost Esp Settings')
 local item_esp_group = Tabs.Esp:AddRightGroupbox('Item Esp Settings')
+local EMF_esp_group = Tabs.Esp:AddRightGroupbox('EMF Esp Settings')
 local world_group = Tabs.World:AddLeftGroupbox('World Settings')
 local menu_group = Tabs['UI Settings']:AddLeftGroupbox('Menu')
 local credits_group = Tabs['UI Settings']:AddRightGroupbox('Credits')
@@ -66,9 +65,12 @@ local bone_highlight = false
 local inf_stamina = false
 local jump_enabled = false
 local full_bright = false
+local emf_name = false
+local ambient_changer = false
 
-local touch_distance = 6
+local touch_distance = 7
 local sprint_speed = 1
+local GhostRoom = nil
 
 local Device = LocalPlayer:GetAttribute("Device")
 local GID = LocalPlayer:GetAttribute("GID")
@@ -83,12 +85,11 @@ local Orb = Workspace.Dynamic.Evidence.Orbs
 local Fingerprints = Workspace.Dynamic.Evidence.Fingerprints
 local EMF = Workspace.Dynamic.Evidence.EMF
 local Van = Workspace.Van
-local Blockers = Workspace.Map.Blockers
 local Closets = Workspace.Map.Closets
-local Doors = Workspace.Map.Doors
 local Bone = Workspace.Map
 local MotionGrid = Workspace.Dynamic.Evidence.MotionGrids
 local FuseBox = Workspace.Map.Fusebox.Fusebox
+local Rooms = workspace.Map.Rooms
 
 --// Main Script
 
@@ -105,11 +106,12 @@ function ChangeSprintSpeed()
     LocalPlayer:SetAttribute("Speed", sprint_speed)
 end
 
-local OrbLabel = game_group:AddLabel('Orbs: Not Found')
-local FingerprintsLabel = game_group:AddLabel('Fingerprint: Not Found')
-local EMFLabel = game_group:AddLabel('Last Seen EMF: None')
 local EMFFiveLabel = game_group:AddLabel('EMF 5: Not Found')
+local FingerprintsLabel = game_group:AddLabel('Fingerprint: Not Found')
+local OrbLabel = game_group:AddLabel('Orbs: Not Found')
+local EMFLabel = game_group:AddLabel('Last Seen EMF: None')
 local MotionLabel = game_group:AddLabel('Motion: Not Found')
+local GhostRoomLabel = game_group:AddLabel('Current Ghost Room: Not Found')
 
 EMF.ChildAdded:Connect(function(child)
     if child:IsA("Part") then
@@ -284,6 +286,33 @@ function BoneHighlight()
     end
 end
 
+function CheckEMFS()
+    for i, v in next, EMF:GetChildren() do
+        if v:IsA("Part") and emf_name and not v:FindFirstChild("Esp BillBoard") then
+            local BillboardGui = Instance.new("BillboardGui")
+            local TextLabel = Instance.new("TextLabel")
+    
+            BillboardGui.Parent = v
+            BillboardGui.Name = "Esp BillBoard"
+            BillboardGui.AlwaysOnTop = true
+            BillboardGui.Size = UDim2.new(0, 200, 0, 50)
+            BillboardGui.StudsOffset = Vector3.new(0, 0, 0)
+    
+            TextLabel.Parent = BillboardGui
+            TextLabel.Name = "Name Esp"
+            TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            TextLabel.Size = UDim2.new(1, 0, 1, 0)
+            TextLabel.Text = v.Name
+            TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TextLabel.TextSize = 14
+            TextLabel.Font = "SourceSansBold"
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.TextStrokeTransparency = 0
+            TextLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        end
+    end
+end
+
 function NoClip()
     LocalPlayer.Character.HumanoidRootPart.CanCollide = false
     LocalPlayer.Character.UpperTorso.CanCollide = false
@@ -349,6 +378,10 @@ local Connections = RunService.RenderStepped:Connect(function()
     if noclip then
         NoClip()
     end
+
+    if emf_name then
+        CheckEMFS()
+    end
 end)
 
 game_group:AddDivider()
@@ -375,8 +408,8 @@ game_group:AddToggle('Anti Ghost Touch', {
 
 game_group:AddSlider('Anti Touch Distance', {
     Text = 'Anti Touch Distance',
-    Default = 6,
-    Min = 6,
+    Default = 7,
+    Min = 7,
     Max = 12,
     Rounding = 1,
     Compact = false,
@@ -433,7 +466,67 @@ game_group:AddButton({
     end,
     DoubleClick = false,
     Tooltip = 'Turns on/off the power box'
-})    
+})
+
+game_group:AddDivider()
+
+game_group:AddButton({
+    Text = 'Find Ghost Room',
+
+    Func = function()
+        local EMF = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("EquipmentModel") and LocalPlayer.Character.EquipmentModel:FindFirstChild("2")
+        
+        if not EMF then
+            Library:Notify("Equip EMF reader first!")
+            return
+        end
+
+        for _, room in ipairs(Rooms:GetChildren()) do
+            if room:IsA("Folder") then
+                local Hitbox = room:FindFirstChild("Hitbox")
+                
+                if Hitbox then
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = Hitbox.CFrame
+                    task.wait(1)
+                    
+                    if EMF.Color == Color3.fromRGB(131, 156, 49) then
+                        Library:Notify("Found Ghost Room: " .. room.Name)
+                        GhostRoomLabel:SetText("Current Ghost Room: " .. room.Name)
+                        GhostRoom = room:FindFirstChild("Hitbox").CFrame
+                        return
+                    end
+                end
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Finds the ghost current room'
+})
+
+game_group:AddButton({
+    Text = 'Teleport To Ghost Room',
+
+    Func = function()
+        if GhostRoom then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = GhostRoom
+            Library:Notify("Teleported to ghost room.")
+        else
+            Library:Notify("Ghost room not found.")
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Teleports you to the ghost room'
+})
+
+game_group:AddButton({
+    Text = 'Tp To Van',
+
+    Func = function()
+        LocalPlayer.Character.HumanoidRootPart.CFrame = Van.PrimaryPart.CFrame + Vector3.new(0, 5, 0)
+    end,
+    DoubleClick = false,
+    Tooltip = 'Teleports you to the van'
+})
 
 player_group:AddToggle('inf stamina', {
     Text = 'Inf Stamina',
@@ -687,6 +780,23 @@ item_esp_group:AddToggle('Bone Highlight', {
     end
 })
 
+EMF_esp_group:AddToggle('Emfs idk', {
+    Text = 'Show Active EMFS',
+    Default = false,
+    Tooltip = 'Shows active EMFS done by ghost',
+
+    Callback = function(Value)
+        emf_name = Value
+        if not Value then
+            for i, v in next, EMF:GetChildren() do
+                if v:IsA("Part") and v:FindFirstChild("Esp BillBoard") then
+                    v:FindFirstChild("Esp BillBoard"):Destroy()
+                end
+            end
+        end
+    end
+})
+
 world_group:AddToggle('Full Bright', {
     Text = 'Full Bright',
     Default = false,
@@ -700,6 +810,40 @@ world_group:AddToggle('Full Bright', {
         else
             Lighting.ClockTime = 0
             Lighting.GlobalShadows = true
+        end
+    end
+})
+
+world_group:AddToggle('Ambient Changer', {
+    Text = 'Ambient Changer',
+    Default = false,
+    Tooltip = 'Changes Color of the games Ambient',
+
+    Callback = function(Value)
+        ambient_changer = Value
+        if Value then
+            Lighting.Ambient = ambient_changer_color
+            Lighting.OutdoorAmbient = ambient_changer_color
+            Lighting.ColorShift_Top = ambient_changer_color
+            Lighting.ColorShift_Bottom = ambient_changer_color
+        else
+            Lighting.Ambient = Color3.fromRGB(0, 0, 0)
+            Lighting.OutdoorAmbient = Color3.fromRGB(0, 0, 0)
+            Lighting.ColorShift_Top = Color3.fromRGB(0, 0, 0)
+            Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
+        end
+    end
+}):AddColorPicker('Color', {
+    Default = Color3.fromRGB(255, 255, 255),
+    Title = 'Color Picker For Ambient',
+
+    Callback = function(Value)
+        ambient_changer_color = Value
+        if ambient_changer then
+            Lighting.Ambient = Value
+            Lighting.OutdoorAmbient = Value
+            Lighting.ColorShift_Top = Value
+            Lighting.ColorShift_Bottom = Value
         end
     end
 })
@@ -742,6 +886,8 @@ menu_group:AddButton('Unload', function()
     full_bright = false
     inf_jump = false
     third_person = false
+    emf_name = false
+    ambient_changer = false
 
     for i, v in next, Workspace:GetDescendants() do
         if v.Name == "Esp BillBoard" or v.Name == "Highlight" then
@@ -751,6 +897,10 @@ menu_group:AddButton('Unload', function()
 
     Lighting.ClockTime = 0
     Lighting.GlobalShadows = true
+    Lighting.Ambient = Color3.fromRGB(0, 0, 0)
+    Lighting.OutdoorAmbient = Color3.fromRGB(0, 0, 0)
+    Lighting.ColorShift_Top = Color3.fromRGB(0, 0, 0)
+    Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
     LocalPlayer.Character.Humanoid.CameraOffset = Vector3.new(0, 0, -1)
 
     WatermarkConnection:Disconnect()
