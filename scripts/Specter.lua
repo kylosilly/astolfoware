@@ -75,7 +75,6 @@ local GhostRoom = nil
 local Device = LocalPlayer:GetAttribute("Device")
 local GID = LocalPlayer:GetAttribute("GID")
 local Join = LocalPlayer:GetAttribute("Join")
-local LastPos = LocalPlayer.Character.HumanoidRootPart.CFrame
 
 --// Paths
 
@@ -427,6 +426,7 @@ game_group:AddButton({
     Func = function()
         for i, v in next, Bone:GetDescendants() do
             if v:IsA("ProximityPrompt") and v.Name == "Bone" then
+                local LastPos = LocalPlayer.Character.HumanoidRootPart.CFrame
                 LocalPlayer.Character.HumanoidRootPart.CFrame = v.Parent.CFrame + Vector3.new(0, 5, 0)
                 task.wait(0.5)
                 fireproximityprompt(v)
@@ -446,6 +446,7 @@ game_group:AddButton({
     Func = function()
         for i, v in next, FuseBox:GetChildren() do
             if v:IsA("ProximityPrompt") and v.name == "FuseboxPrompt" then
+                local LastPos = LocalPlayer.Character.HumanoidRootPart.CFrame
                 LocalPlayer.Character.HumanoidRootPart.CFrame = v.Parent.CFrame
                 task.wait(0.2)
                 fireproximityprompt(v)
