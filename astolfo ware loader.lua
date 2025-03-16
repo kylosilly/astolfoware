@@ -33,6 +33,9 @@ elseif Info.Name == "[🐍 LUNAR YEAR] Horrific Housing" then
 elseif Info.Name == "SPECTER Classic [AI]" then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/Specter.lua"))()
     Lib:Notify('Supported! loading: ' .. Info.Name)
+elseif Info.Name == "SPECTER" then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/SpecterLobby.lua"))()
+    Lib:Notify('Supported! loading: ' .. Info.Name)
 else
     Lib:Notify('Game not supported: ' .. Info.Name)
 end
