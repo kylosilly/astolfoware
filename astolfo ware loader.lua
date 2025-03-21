@@ -18,16 +18,7 @@ if identifyexecutor() then
     end
 end
 
-if Chart == 78360449985300 then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/Disch.lua"))()
-    Lib:Notify('Supported! loading: ' .. Info.Name)
-elseif Chart == 116495829188952 then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/DeadRailLobby.lua"))()
-    Lib:Notify('Supported! loading: ' .. Info.Name)
-elseif Chart == 70876832253163 then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/DeadRailGame.lua"))()
-    Lib:Notify('Supported! loading: ' .. Info.Name)
-elseif Info.Name == "[🐍 LUNAR YEAR] Horrific Housing" then
+if Info.Name == "[🐍 LUNAR YEAR] Horrific Housing" then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/Horrific%20Housing.lua"))()
     Lib:Notify('Supported! loading: ' .. Info.Name)
 elseif Info.Name == "SPECTER Classic [AI]" then
