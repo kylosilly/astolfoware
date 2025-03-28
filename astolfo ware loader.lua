@@ -26,9 +26,6 @@ elseif place_id == 8267733039 then
 elseif info.Name == "SPECTER Classic [AI]" then
     loadstring(game:HttpGet(scripts.."Specter.lua"))()
     lib:Notify('Supported game loading: ' .. info.Name)
-elseif place_id == 71945043676322 then
-    loadstring(game:HttpGet(scripts.."deadsails.lua"))()
-    lib:Notify('Supported game loading: ' .. info.Name)
 else
     lib:Notify('Game not supported: ' .. info.Name .. ' if you wanna support this game join the discord copied to your clipboard')
     setclipboard("https://discord.gg/U5yjDvsxHR")
