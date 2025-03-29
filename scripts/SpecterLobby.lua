@@ -60,9 +60,8 @@ local blacklisted_crates = {
     "Holiday2024Collection",
     "HolidayCollection",
     "Lunar2024Collection",
-    "MetalsCollection", -- I blacklisted these because they cost ~ 999k cash shown in the module (You can always remove it from the blacklist)
     "Summer2024Collection",
-    "GoldNature"
+    "GoldNature"  -- I blacklisted these because they cost ~ 999k cash shown in the module (You can always remove it from the blacklist)
 }
 
 local maps = {
