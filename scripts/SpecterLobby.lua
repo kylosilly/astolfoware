@@ -61,6 +61,7 @@ local blacklisted_crates = {
     "HolidayCollection",
     "Lunar2024Collection",
     "Summer2024Collection",
+    "Lunar2025Collection",
     "GoldNature"  -- I blacklisted these because they cost ~ 999k cash shown in the module (You can always remove it from the blacklist)
 }
 
