@@ -301,13 +301,13 @@ host_group:AddButton({
     Func = function()
         if selected_map and selected_difficulty and max_players_lobby and lobby_name and lobby_type then
             replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("LobbyService"):WaitForChild("RF"):WaitForChild("CreateLobby"):InvokeServer(lobby_name, max_players_lobby, 0, lobby_type)
-            lib:Notify('Lobby Created: ' .. lobby_name .. ' Map: ' .. selected_map .. ' Difficulty: ' .. selected_difficulty)
+            library:Notify('Lobby Created: ' .. lobby_name .. ' Map: ' .. selected_map .. ' Difficulty: ' .. selected_difficulty)
             task.wait(0.1)
             replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("LobbyService"):WaitForChild("RF"):WaitForChild("ChangeValue"):InvokeServer("Map", selected_map)
             task.wait(0.1)
             replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("LobbyService"):WaitForChild("RF"):WaitForChild("ChangeValue"):InvokeServer("Difficulty", selected_difficulty)
         else
-            lib:Notify('Finish all settings to create a lobby stupid retard')
+            library:Notify('Finish all settings to create a lobby stupid retard')
         end
     end,
     DoubleClick = false,
