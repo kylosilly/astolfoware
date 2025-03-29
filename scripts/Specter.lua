@@ -118,12 +118,15 @@ else
 end
 
 local emf_label = game_group:AddLabel('EMF 5: Not Found')
-local last_emf_label = game_group:AddLabel('Last EMF: None')
 local fingerprint_label = game_group:AddLabel('Fingerprints: Not Found')
-local orb_label = game_group:AddLabel('Orbs: Not Found')
-local motion_label = game_group:AddLabel('Motion: Not Found')
 local freezing_label = game_group:AddLabel('Freezing: Not Found')
-local spirit_box_label = game_group:AddLabel('Spirit Box:  Not Found')
+local motion_label = game_group:AddLabel('Motion: Not Found')
+local orb_label = game_group:AddLabel('Orbs: Not Found')
+local spirit_box_label = game_group:AddLabel('Spirit Box: Not Found')
+
+game_group:AddDivider()
+
+local last_emf_label = game_group:AddLabel('Last EMF: None')
 local ghost_room_label = game_group:AddLabel('Ghost Room: Not Found')
 local ghost_speed_label = game_group:AddLabel('Ghost Speed: Not Found')
 local sanity_label = player_group:AddLabel('Sanity:')
@@ -617,7 +620,7 @@ game_group:AddButton({
             replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("Toggle"):InvokeServer("EMF Reader")
         end
 
-        if van.VanDoor.Rotate.Rotation ~= Vector3.new(-96.99700164794922, 90, 0) then
+        if not ghost:FindFirstChildOfClass("Model") then
             library:Notify("Open the van first!")
             return
         end
@@ -688,8 +691,7 @@ game_group:AddButton({
             end
 
             if not thermometer_screen.Enabled then
-                library:Notify("Enable thermometer first!")
-                return
+                replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("Toggle"):InvokeServer("Thermometer")
             end
 
             if not ghost_room then
@@ -736,8 +738,7 @@ game_group:AddButton({
         end
 
         if spirit_box_screen.Color == Color3.fromRGB(0, 0, 0) then
-            library:Notify("Enable spirit box first!")
-            return
+            replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("Toggle"):InvokeServer("Spirit Box")
         end
 
         if not ghost_room then
@@ -812,6 +813,8 @@ game_group:AddButton({
     DoubleClick = false,
     Tooltip = 'Teleports Motion Grids to the ghost to check for motion'
 })
+
+game_group:AddDivider()
 
 game_group:AddButton({
     Text = 'Tp To Van',
