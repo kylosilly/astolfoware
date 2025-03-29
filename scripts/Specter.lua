@@ -402,7 +402,7 @@ espconnection = run_service.RenderStepped:Connect(function()
     
     if cursed_object_name then
         for _, v in next, cursed_objects:GetChildren() do
-            if (v:IsA("MeshPart") or v:IsA("Model") or v:IsA("Part")) and not (v.Name == "Chair" or v.Name == "Body") and not v:FindFirstChild("Esp BillBoard") then
+            if (v:IsA("MeshPart") or v:IsA("Model") or v:IsA("Part")) and not (v.Name == "Chair" or v.Name == "Body" or v.Name == "Eye1" or v.Name == "Eye2") and not v:FindFirstChild("Esp BillBoard") then
                 local esp_billboard = Instance.new("BillboardGui")
                 esp_billboard.Parent = v
                 esp_billboard.Name = "Esp BillBoard"
@@ -615,6 +615,11 @@ game_group:AddButton({
 
         if not emf or emf.Color ~= Color3.fromRGB(52, 142, 64) then
             replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("Toggle"):InvokeServer("EMF Reader")
+        end
+
+        if van.VanDoor.Rotate.Rotation ~= Vector3.new(-96.99700164794922, 90, 0) then
+            library:Notify("Open the van first!")
+            return
         end
 
         for _, room in pairs(rooms:GetChildren()) do
