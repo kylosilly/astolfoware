@@ -396,7 +396,6 @@ if started_round then
                 last_pos[motion_grids] = motion_grids.CFrame
                 local ghost = workspace.NPCs:FindFirstChildOfClass("Model")
                 motion_grids.CFrame = ghost.HumanoidRootPart.CFrame + Vector3.new(1, 0, 0)
-                local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
             end
         end
 
