@@ -339,6 +339,8 @@ if checked then
 
             if not thermometer then
                 local_player:Kick("Thermometer not found! please report this to @kylosilly on discord!")
+                wait(1)
+                teleport_service:Teleport(8267733039)
             end
 
             if thermometer then
