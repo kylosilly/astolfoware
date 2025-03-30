@@ -408,7 +408,7 @@ if started_round then
         task.wait(1)
 
         library:Notify("Finished Checking All Staying 30 More Seconds In Room To Get Evidences")
-        local_player.Character.HumanoidRootPart.CFrame = workspace.Dynamic.Weather["73"].Pillar.CFrame
+        local_player.Character.HumanoidRootPart.CFrame = CFrame.new(-223, 166, -213)
         task.wait(30)
         local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
     end
