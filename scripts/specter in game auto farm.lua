@@ -275,7 +275,7 @@ if started_round then
                                     teleport_service:Teleport(8267733039)
                                 end
 
-                                task.wait(5)
+                                task.wait(9)
 
                                 if motion_grid then
                                     for _, motion_grids in pairs(motion_grid:GetDescendants()) do
@@ -403,7 +403,7 @@ if started_round then
                 teleport_service:Teleport(8267733039)
             end
 
-            task.wait(7)
+            task.wait(9)
 
             for _, motion_grids in pairs(motion_grid:GetDescendants()) do
                 if motion_grids:IsA("Part") then
