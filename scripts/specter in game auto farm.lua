@@ -149,7 +149,7 @@ if collected_bone then
         local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(3, 0, 0)
         camera.CFrame = van_prompt.Parent.CFrame
         task.wait(1)
-        for i = 1, 100 do
+        for i = 1, 10 do
             fireproximityprompt(van_prompt)
             task.wait(0.1)
         end
