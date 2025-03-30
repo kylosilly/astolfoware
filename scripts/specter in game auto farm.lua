@@ -134,9 +134,9 @@ if checked_info then
         local last_pos = local_player.Character.HumanoidRootPart.CFrame
 
         local_player.Character.HumanoidRootPart.CFrame = bone.CFrame + Vector3.new(0, 5, 0)
-        task.wait(.25)
+        task.wait(0.25)
         fireproximityprompt(bone_prompt)
-        task.wait(.25)
+        task.wait(0.25)
         local_player.Character.HumanoidRootPart.CFrame = last_pos
         collected_bone = true
         library:Notify("Collected Bone")
@@ -152,9 +152,9 @@ if collected_bone then
 
     if van_prompt then
         local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(5, 0, 0)
-        task.wait(.5)
+        task.wait(0.75)
         fireproximityprompt(van_prompt)
-        task.wait(.5)
+        task.wait(0.75)
         local_player.Character.HumanoidRootPart.CFrame = last_pos
         library:Notify("Started Game")
         started_round = true
@@ -242,9 +242,60 @@ if started_round then
             end
 
             if not got_room then
-                local_player:kick("Ghost room not found! please report this to @kylosilly on discord!")
-                wait(1)
-                teleport_service:Teleport(8267733039)
+                replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("Drop"):InvokeServer(2)
+                for _, equipment in pairs(van_equipment:GetChildren()) do
+                    if equipment:IsA("Model") and equipment.Name == "Motion Sensor" then
+                        local_player.Character.HumanoidRootPart.CFrame = equipment.PrimaryPart.CFrame + Vector3.new(0, 5, 0)
+                        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("PickupItem"):InvokeServer(equipment)
+                        task.wait(.25)
+                        for _, room in pairs(rooms:GetChildren()) do
+                            if room:IsA("Folder") then
+                                local hitbox = room:FindFirstChild("Hitbox")
+
+                                if hitbox then
+                                    for i = 1, 2 do
+                                        local_player.Character.HumanoidRootPart.CFrame = hitbox.CFrame
+                                        task.wait()
+                                    end
+
+                                    local last_pos = {}
+
+                                    camera.CFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + Vector3.new(1, -1.5, 0))
+                                    task.wait(0.75)
+                                    mouse1click()
+                                end
+
+                                task.wait(5)
+
+                                local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+
+                                if not motion_grid then
+                                    library:Notify("Motion Grids not found place one before using this feature!")
+                                    wait(1)
+                                    teleport_service:Teleport(8267733039)
+                                end
+
+                                task.wait(5)
+
+                                if motion_grid then
+                                    for _, motion_grids in pairs(motion_grid:GetDescendants()) do
+                                        if motion_grids:IsA("Part") then
+                                            last_pos[motion_grids] = motion_grids.CFrame
+                                            local ghost = workspace.NPCs:FindFirstChildOfClass("Model")
+                                            motion_grids.CFrame = ghost.HumanoidRootPart.CFrame + Vector3.new(1, 0, 0)
+                                        end
+                                    end
+
+                                    task.wait()
+
+                                    for v, pos in pairs(last_pos) do
+                                        v.CFrame = pos
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
             end
         end
 
@@ -352,7 +403,7 @@ if started_round then
                 teleport_service:Teleport(8267733039)
             end
 
-            task.wait(5)
+            task.wait(7)
 
             for _, motion_grids in pairs(motion_grid:GetDescendants()) do
                 if motion_grids:IsA("Part") then
