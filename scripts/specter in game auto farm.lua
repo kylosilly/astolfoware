@@ -185,6 +185,10 @@ if started_round and not workspace.NPCs:FindFirstChildOfClass("Model") then
     end
 else
     checked = true
+else
+    local_player:kick("Failed to start game please report this to @kylosilly on discord!")
+    wait(5)
+    teleport_service:Teleport(8267733039)
 end
 
 if checked then
