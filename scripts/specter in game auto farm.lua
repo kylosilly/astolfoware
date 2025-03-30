@@ -451,5 +451,12 @@ if checked then
                 v.CFrame = pos
             end
         end
+
+        task.wait(1)
+
+        library:Notify("Finished checking staying in room for few more seconds to get evidences")
+        local_player.Character.HumanoidRootPart.CFrame = ghost_room
+        task.wait(10)
+        local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
     end
 end
