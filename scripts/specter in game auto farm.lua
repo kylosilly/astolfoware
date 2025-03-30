@@ -416,45 +416,87 @@ if started_round then
     if got_emf and got_fingerprint and freezing then
         library:Notify("Ghost is: Banshee")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Banshee")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif freezing and got_box and got_orb then
         library:Notify("Ghost is: Mare")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Mare")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_motion and got_box and freezing then
         library:Notify("Ghost is: Wendigo")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Wendigo")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_box and got_fingerprint and got_orb then
         library:Notify("Ghost is: Poltergeist")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Poltergeist")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif freezing and got_orb and got_emf then
         library:Notify("Ghost is: Phantom")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Phantom")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_emf and got_motion and got_orb then
         library:Notify("Ghost is: Jinn")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Jinn")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_emf and freezing and got_motion then
         library:Notify("Ghost is: Upyr")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Upyr")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_emf and got_fingerprint and got_box then
         library:Notify("Ghost is: Aswang")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Aswang")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_orb and got_fingerprint and freezing then
         library:Notify("Ghost is: Thaye")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Thaye")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_emf and got_fingerprint and got_orb then
         library:Notify("Ghost is: O Tokata")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("O Tokata")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_motion and got_emf and got_box then
         library:Notify("Ghost is: Myling")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Myling")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_motion and freezing and got_orb then
         library:Notify("Ghost is: Afarit")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Afarit")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_motion and got_emf and got_fingerprint then
         library:Notify("Ghost is: Preta")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Preta")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     elseif got_motion and freezing and got_fingerprint then
         library:Notify("Ghost is: Yokai")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Yokai")
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     else
         library:Notify("Couldnt guess ghost have fun guessing")
     end
