@@ -37,12 +37,21 @@ local rooms = map.Rooms
 local checked_spirit_box = false
 local check_fingerprint = true
 local checked_freezing = false
+local got_fingerprint = false
 local checked_motion = false
 local collected_bone = false
 local checked_info = false
-local got_room = false
+local no_freezing = false
+local got_motion = false
+local no_motion = false
 local check_orb = true
 local check_emf = true
+local got_room = false
+local freezing = false
+local got_emf = false
+local got_box = false
+local got_orb = false
+local no_box = false
 
 local started_round = false
 local collected_equipment = false
@@ -57,6 +66,7 @@ emf_folder.ChildAdded:Connect(function(emf)
         library:Notify("Found EMF 5")
         print("Found EMF 5")
         check_emf = false
+        got_emf = true
     end
 end)
 
@@ -65,6 +75,7 @@ fingerprints_folder.ChildAdded:Connect(function(fingerprint)
         library:Notify("Found Fingerprints")
         print("Found Fingerprint")
         check_fingerprint = false
+        got_fingerprint = true
     end
 end)
 
@@ -73,6 +84,7 @@ orbs_folder.ChildAdded:Connect(function(orb)
         library:Notify("Found Orbs")
         print("Found Orbs")
         check_orb = false
+        got_orb = true
     end
 end)
 
@@ -83,12 +95,14 @@ motion_connection = run_service.RenderStepped:Connect(function()
                 library:Notify("Found Motion")
                 print("Found Motion")
                 checked_motion = true
+                got_motion = true
                 motion_connection:Disconnect()
                 break
             elseif motion.BrickColor == BrickColor.new("Toothpaste") then
                 library:Notify("No Motion")
                 print("No Motion")
                 checked_motion = true
+                no_motion = true
                 motion_connection:Disconnect()
                 break
             end
@@ -326,10 +340,12 @@ if started_round then
                     library:Notify("Got Freezing Temperature")
                     print("Got Freezing Temperature")
                     checked_freezing = true
+                    freezing = true
                 else
                     library:Notify("No Freezing Temperature")
                     print("No Freezing Temperature")
                     checked_freezing = true
+                    no_freezing = true
                 end
             end
         end
@@ -358,6 +374,7 @@ if started_round then
                         library:Notify("Got Spirit Box")
                         print("Got Spirit Box")
                         checked_spirit_box = true
+                        got_box = true
                         responses:Disconnect()
                     end
                 end)
@@ -376,6 +393,7 @@ if started_round then
                     library:Notify("No Spirit Box")
                     print("No Spirit Box")
                     checked_spirit_box = true
+                    no_box = true
                 end
             end
         end
@@ -442,9 +460,55 @@ if started_round then
 
         task.wait(1)
 
-        library:Notify("Finished Checking All Staying 15 More Seconds In Room To Get Evidences")
-        local_player.Character.HumanoidRootPart.CFrame = ghost_room
-        task.wait(15)
+        library:Notify("Finished Checking All Staying 30 More Seconds In Room To Get Evidences")
+        local_player.Character.HumanoidRootPart.CFrame = workspace.Dynamic.Weather["73"].Pillar.CFrame
+        task.wait(30)
         local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+    end
+
+    if got_emf and got_fingerprint and freezing then
+        library:Notify("Ghost is: Banshee")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Banshee")
+    elseif freezing and got_box and got_orb then
+        library:Notify("Ghost is: Mare")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Mare")
+    elseif got_motion and got_box and freezing then
+        library:Notify("Ghost is: Wendigo")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Wendigo")
+    elseif got_box and got_fingerprint and got_orb then
+        library:Notify("Ghost is: Poltergeist")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Poltergeist")
+    elseif freezing and got_orb and got_emf then
+        library:Notify("Ghost is: Phantom")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Phantom")
+    elseif got_emf and got_motion and got_orb then
+        library:Notify("Ghost is: Jinn")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Jinn")
+    elseif got_emf and freezing and got_motion then
+        library:Notify("Ghost is: Upyr")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Upyr")
+    elseif got_emf and got_fingerprint and got_box then
+        library:Notify("Ghost is: Aswang")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Aswang")
+    elseif got_orb and got_fingerprint and freezing then
+        library:Notify("Ghost is: Thaye")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Thaye")
+    elseif got_emf and got_fingerprint and got_orb then
+        library:Notify("Ghost is: O Tokata")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("O Tokata")
+    elseif got_motion and got_emf and got_box then
+        library:Notify("Ghost is: Myling")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Myling")
+    elseif got_motion and freezing and got_orb then
+        library:Notify("Ghost is: Afarit")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Afarit")
+    elseif got_motion and got_emf and got_fingerprint then
+        library:Notify("Ghost is: Preta")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Preta")
+    elseif got_motion and freezing and got_fingerprint then
+        library:Notify("Ghost is: Yokai")
+        replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Yokai")
+    else
+        library:Notify("Couldnt guess ghost have fun guessing")
     end
 end
