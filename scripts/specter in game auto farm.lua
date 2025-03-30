@@ -16,6 +16,7 @@ local virtual_input_manager = game:GetService("VirtualInputManager")
 local replicated_storage = game:GetService("ReplicatedStorage")
 local text_chat_service = game:GetService("TextChatService")
 local local_player = game:GetService("Players").LocalPlayer
+local teleport_service = game:GetService("TeleportService")
 local run_service = game:GetService("RunService")
 local workspace = game:GetService("Workspace")
 local lighting = game:GetService("Lighting")
@@ -121,6 +122,8 @@ if local_player then
     end
 elseif not checked_info then
     local_player:kick("Couldnt get attributes of localplayer please report this to @kylosilly on discord!")
+    wait(1)
+    teleport_service:Teleport(8267733039)
 end
 
 if checked_info then
@@ -172,6 +175,8 @@ if started_round then
 
     if not collected_equipment then
         local_player:kick("Equipment not found! please report this to @kylosilly on discord!")
+        wait(1)
+        teleport_service:Teleport(8267733039)
     end
 
     if collected_equipment then
@@ -185,6 +190,8 @@ if started_round then
 
         if not emf_tool then
             local_player:kick("EMF tool not found! please report this to @kylosilly on discord!")
+            wait(1)
+            teleport_service:Teleport(8267733039)
         end
 
         if not emf or emf.Color ~= Color3.fromRGB(52, 142, 64) then
@@ -236,6 +243,8 @@ if started_round then
 
             if not got_room then
                 local_player:kick("Ghost room not found! please report this to @kylosilly on discord!")
+                wait(1)
+                teleport_service:Teleport(8267733039)
             end
         end
 
@@ -283,6 +292,8 @@ if started_round then
 
             if not spirit_box then
                 local_player:Kick("Spirit box not found! please report this to @kylosilly on discord!")
+                wait(1)
+                teleport_service:Teleport(8267733039)
             end
 
             if spirit_box then
@@ -326,7 +337,7 @@ if started_round then
                     replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("PickupItem"):InvokeServer(equipment)
                     local_player.Character.HumanoidRootPart.CFrame = ghost_room
                     camera.CFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + Vector3.new(1, -1.5, 0))
-                    task.wait(0.5)
+                    task.wait(0.75)
                     mouse1click()
                 end
             end
@@ -337,6 +348,8 @@ if started_round then
 
             if not motion_grid then
                 local_player:Kick("Motion grid not found! please report this to @kylosilly on discord!")
+                wait(1)
+                teleport_service:Teleport(8267733039)
             end
 
             task.wait(5)
