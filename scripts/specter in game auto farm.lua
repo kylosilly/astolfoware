@@ -11,7 +11,6 @@ local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/violi
 library:Notify("Running Script, sit back and relax :3")
 library:Notify("Once the auto farm is finished please check console for the evidences")
 
-local proximitry_prompt_service = game:GetService("ProximityPromptService")
 local virtual_input_manager = game:GetService("VirtualInputManager")
 local replicated_storage = game:GetService("ReplicatedStorage")
 local text_chat_service = game:GetService("TextChatService")
@@ -52,10 +51,6 @@ local ghost_room = nil
 
 lighting.ClockTime = 12
 lighting.GlobalShadows = false
-
-proximitry_prompt_service.PromptButtonHoldBegan:Connect(function(prompt)
-    prompt.HoldDuration = 0
-end)
 
 emf_folder.ChildAdded:Connect(function(emf)
     if emf.Name == "EMF5" and check_emf then
@@ -152,6 +147,7 @@ if collected_bone then
 
     if van_prompt then
         local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(3, 0, 0)
+        camera.CFrame = van_prompt.Parent.CFrame
         task.wait(1)
         for i = 1, 100 do
             fireproximityprompt(van_prompt)
