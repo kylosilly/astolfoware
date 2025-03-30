@@ -135,9 +135,9 @@ if checked_info then
         local last_pos = local_player.Character.HumanoidRootPart.CFrame
 
         local_player.Character.HumanoidRootPart.CFrame = bone.CFrame + Vector3.new(0, 5, 0)
-        task.wait(0.25)
+        task.wait(0.4)
         fireproximityprompt(bone_prompt)
-        task.wait(0.25)
+        task.wait(0.4)
         local_player.Character.HumanoidRootPart.CFrame = last_pos
         collected_bone = true
         library:Notify("Collected Bone")
