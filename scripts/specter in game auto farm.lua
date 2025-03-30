@@ -44,7 +44,6 @@ local checked_info = false
 local got_room = false
 local check_orb = true
 local check_emf = true
-local checked = false
 
 local started_round = false
 local collected_equipment = false
@@ -154,45 +153,18 @@ if collected_bone then
     if van_prompt then
         local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(3, 0, 0)
         task.wait(1)
-        fireproximityprompt(van_prompt)
-        fireproximityprompt(van_prompt)
-        fireproximityprompt(van_prompt)
+        for i = 1, 100 do
+            fireproximityprompt(van_prompt)
+            task.wait(0.1)
+        end
         task.wait(1)
-        fireproximityprompt(van_prompt)
         local_player.Character.HumanoidRootPart.CFrame = last_pos
         library:Notify("Started Game")
         started_round = true
     end
 end
 
-task.wait(1)
-
-if started_round and not workspace.NPCs:FindFirstChildOfClass("Model") then
-    library:Notify("Failed to start game retrying...")
-    local last_pos = local_player.Character.HumanoidRootPart.CFrame
-    local van_prompt = van_button:FindFirstChildOfClass("ProximityPrompt")
-
-    if van_prompt then
-        local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(3, 0, 0)
-        task.wait(1)
-        fireproximityprompt(van_prompt)
-        fireproximityprompt(van_prompt)
-        fireproximityprompt(van_prompt)
-        task.wait(1)
-        fireproximityprompt(van_prompt)
-        local_player.Character.HumanoidRootPart.CFrame = last_pos
-        library:Notify("Started Game")
-        checked = true
-    else
-        local_player:kick("Failed to start game please report this to @kylosilly on discord!")
-        wait(5)
-        teleport_service:Teleport(8267733039)
-    end
-else
-    checked = true
-end
-
-if checked then
+if started_round then
     local last_pos = local_player.Character.HumanoidRootPart.CFrame
 
     for _, equipment in pairs(van_equipment:GetChildren()) do
