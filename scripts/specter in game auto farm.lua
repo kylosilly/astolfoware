@@ -44,6 +44,7 @@ local checked_info = false
 local got_room = false
 local check_orb = true
 local check_emf = true
+local checked = false
 
 local started_round = false
 local collected_equipment = false
@@ -161,9 +162,26 @@ if collected_bone then
     end
 end
 
-task.wait()
+task.wait(1)
 
-if started_round then
+if started_round and not workspace.NPCs:FindFirstChildOfClass("Model") then
+    local last_pos = local_player.Character.HumanoidRootPart.CFrame
+    local van_prompt = van_button:FindFirstChildOfClass("ProximityPrompt")
+
+    if van_prompt then
+        local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(3, 0, 0)
+        task.wait(1)
+        fireproximityprompt(van_prompt)
+        task.wait(1)
+        local_player.Character.HumanoidRootPart.CFrame = last_pos
+        library:Notify("Started Game")
+        checked = true
+    end
+else
+    checked = true
+end
+
+if checked then
     local last_pos = local_player.Character.HumanoidRootPart.CFrame
 
     for _, equipment in pairs(van_equipment:GetChildren()) do
