@@ -149,7 +149,7 @@ if collected_bone then
         local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(3, 0, 0)
         camera.CFrame = van_prompt.Parent.CFrame
         task.wait(1)
-        for i = 1, 10 do
+        for i = 1, 100 do
             fireproximityprompt(van_prompt)
             task.wait(0.1)
         end
@@ -420,11 +420,31 @@ if started_round then
             end
         end
 
+        task.wait(2)
+
+        if not checked_spirit_box then
+            local last_pos = {}
+
+            for _, motion_grids in pairs(motion_grid:GetDescendants()) do
+                if motion_grids:IsA("Part") then
+                    last_pos[motion_grids] = motion_grids.CFrame
+                    local ghost = workspace.NPCs:FindFirstChildOfClass("Model")
+                    motion_grids.CFrame = ghost.HumanoidRootPart.CFrame + Vector3.new(1, 0, 0)
+                end
+            end
+
+            task.wait()
+
+            for v, pos in pairs(last_pos) do
+                v.CFrame = pos
+            end
+        end
+
         task.wait(1)
 
-        library:Notify("Finished Checking All Staying 10 More Seconds In Room To Get Evidences")
+        library:Notify("Finished Checking All Staying 15 More Seconds In Room To Get Evidences")
         local_player.Character.HumanoidRootPart.CFrame = ghost_room
-        task.wait(10)
+        task.wait(15)
         local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
     end
 end
