@@ -182,13 +182,13 @@ if started_round and not workspace.NPCs:FindFirstChildOfClass("Model") then
         local_player.Character.HumanoidRootPart.CFrame = last_pos
         library:Notify("Started Game")
         checked = true
+    else
+        local_player:kick("Failed to start game please report this to @kylosilly on discord!")
+        wait(5)
+        teleport_service:Teleport(8267733039)
     end
 else
     checked = true
-else
-    local_player:kick("Failed to start game please report this to @kylosilly on discord!")
-    wait(5)
-    teleport_service:Teleport(8267733039)
 end
 
 if checked then
@@ -450,5 +450,12 @@ if checked then
                 v.CFrame = pos
             end
         end
+
+        task.wait(1)
+
+        library:Notify("Finished Checking All Staying 10 More Seconds In Room To Get Evidences")
+        local_player.Character.HumanoidRootPart.CFrame = ghost_room
+        task.wait(10)
+        local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
     end
 end
