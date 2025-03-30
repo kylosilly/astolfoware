@@ -151,15 +151,17 @@ if collected_bone then
     local van_prompt = van_button:FindFirstChildOfClass("ProximityPrompt")
 
     if van_prompt then
-        local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(5, 0, 0)
-        task.wait(0.75)
+        local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(3, 0, 0)
+        task.wait(1)
         fireproximityprompt(van_prompt)
-        task.wait(0.75)
+        task.wait(1)
         local_player.Character.HumanoidRootPart.CFrame = last_pos
         library:Notify("Started Game")
         started_round = true
     end
 end
+
+task.wait()
 
 if started_round then
     local last_pos = local_player.Character.HumanoidRootPart.CFrame
