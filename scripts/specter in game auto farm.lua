@@ -168,6 +168,7 @@ end
 task.wait(1)
 
 if started_round and not workspace.NPCs:FindFirstChildOfClass("Model") then
+    library:Notify("Failed to start game retrying...")
     local last_pos = local_player.Character.HumanoidRootPart.CFrame
     local van_prompt = van_button:FindFirstChildOfClass("ProximityPrompt")
 
