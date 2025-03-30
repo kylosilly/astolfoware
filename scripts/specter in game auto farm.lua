@@ -306,7 +306,7 @@ if checked then
                                     teleport_service:Teleport(8267733039)
                                 end
 
-                                task.wait(9)
+                                task.wait(10)
 
                                 if motion_grid then
                                     for _, motion_grids in pairs(motion_grid:GetDescendants()) do
@@ -434,7 +434,7 @@ if checked then
                 teleport_service:Teleport(8267733039)
             end
 
-            task.wait(9)
+            task.wait(10)
 
             for _, motion_grids in pairs(motion_grid:GetDescendants()) do
                 if motion_grids:IsA("Part") then
@@ -454,9 +454,9 @@ if checked then
 
         task.wait(1)
 
-        library:Notify("Finished Checking All Staying 10 More Seconds In Room To Get Evidences")
+        library:Notify("Finished Checking All Staying 20 More Seconds In Room To Get Evidences")
         local_player.Character.HumanoidRootPart.CFrame = ghost_room
-        task.wait(10)
+        task.wait(20)
         local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
     end
 end
