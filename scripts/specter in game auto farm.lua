@@ -422,9 +422,9 @@ if started_round then
 
         task.wait(1)
 
-        library:Notify("Finished Checking All Staying 20 More Seconds In Room To Get Evidences")
+        library:Notify("Finished Checking All Staying 10 More Seconds In Room To Get Evidences")
         local_player.Character.HumanoidRootPart.CFrame = ghost_room
-        task.wait(20)
+        task.wait(10)
         local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
     end
 end
