@@ -4,7 +4,7 @@ if not game:IsLoaded() then
     print("Loaded")
 end
 
-task.wait(7)
+task.wait(5)
 
 local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua'))()
 
@@ -330,8 +330,8 @@ if checked then
             end
         end
 
-        library:Notify("Waiting a few secounds for the ghost to chill to prevent hunts")
-        task.wait(10)
+        library:Notify("Waiting 15 seconds to prevent hunts")
+        task.wait(15)
 
         if got_room then
             virtual_input_manager:SendKeyEvent(true, Enum.KeyCode.One, false, nil)
