@@ -155,7 +155,10 @@ if collected_bone then
         local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(3, 0, 0)
         task.wait(1)
         fireproximityprompt(van_prompt)
+        fireproximityprompt(van_prompt)
+        fireproximityprompt(van_prompt)
         task.wait(1)
+        fireproximityprompt(van_prompt)
         local_player.Character.HumanoidRootPart.CFrame = last_pos
         library:Notify("Started Game")
         started_round = true
@@ -172,7 +175,10 @@ if started_round and not workspace.NPCs:FindFirstChildOfClass("Model") then
         local_player.Character.HumanoidRootPart.CFrame = van_prompt.Parent.CFrame + Vector3.new(3, 0, 0)
         task.wait(1)
         fireproximityprompt(van_prompt)
+        fireproximityprompt(van_prompt)
+        fireproximityprompt(van_prompt)
         task.wait(1)
+        fireproximityprompt(van_prompt)
         local_player.Character.HumanoidRootPart.CFrame = last_pos
         library:Notify("Started Game")
         checked = true
