@@ -23,8 +23,8 @@ local lighting = game:GetService("Lighting")
 local camera = workspace.CurrentCamera
 
 local fingerprints_folder = workspace.Dynamic.Evidence.Fingerprints
-local motions_folder = workspace.Dynamic.Evidence.MotionGrids -- for checking if ghost touches
-local motion_grid = workspace.Dynamic.Evidence.MotionGrids -- for tping it to ghost
+local motions_folder = workspace.Dynamic.Evidence.MotionGrids
+local motion_grid = workspace.Dynamic.Evidence.MotionGrids
 local orbs_folder = workspace.Dynamic.Evidence.Orbs
 local emf_folder = workspace.Dynamic.Evidence.EMF
 
@@ -147,9 +147,9 @@ if checked_info then
         local last_pos = local_player.Character.HumanoidRootPart.CFrame
 
         local_player.Character.HumanoidRootPart.CFrame = bone.CFrame + Vector3.new(0, 5, 0)
-        task.wait(0.5)
+        task.wait(0.4)
         fireproximityprompt(bone_prompt)
-        task.wait(0.5)
+        task.wait(0.4)
         local_player.Character.HumanoidRootPart.CFrame = last_pos
         collected_bone = true
         library:Notify("Collected Bone")
@@ -264,9 +264,6 @@ if started_round then
                 teleport_service:Teleport(8267733039)
             end
         end
-
-        library:Notify("Waiting 15 seconds to prevent hunts")
-        task.wait(15)
 
         if got_room then
             virtual_input_manager:SendKeyEvent(true, Enum.KeyCode.One, false, nil)
@@ -449,7 +446,7 @@ if started_round then
                     end
                 end)
 
-                task.wait(10)
+                task.wait(25)
 
                 if got_writing then
                     local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
@@ -461,6 +458,15 @@ if started_round then
                 end
             end
         end
+    end
+
+    task.wait(1)
+
+    if no_writing or got_writing then
+        local_player.Character.HumanoidRootPart.CFrame = CFrame.new(-223, 166, -213)
+        library:Notify("Waiting 30 seconds for more evidence...")
+        task.wait(30)
+        local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
     end
 
     if got_emf and got_fingerprint and freezing then
@@ -620,8 +626,8 @@ if started_round then
         task.wait(0.25)
         fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     else
-        library:Notify("Couldnt guess ghost ending round in 15 seconds have fun guessing in that time")
-        task.wait(15)
+        library:Notify("Failed to guess ghost, teleporting back to lobby...")
+        task.wait(0.25)
         local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
         task.wait(0.25)
         fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
