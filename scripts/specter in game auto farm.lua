@@ -423,7 +423,7 @@ if started_round then
                 task.wait(5)
 
                 local_player.Character.HumanoidRootPart.CFrame = CFrame.new(-223, 166, -213)
-                local book = workspace.Equipment:FindFirstChild("Book")
+                local book = workspace.Equipment.Book
 
                 if not book then
                     local_player:Kick("Book not found! please report this to @kylosilly on discord!")
@@ -449,13 +449,11 @@ if started_round then
                     end
                 end)
 
+                task.wait(10)
+
                 if got_writing then
                     local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
-                end
-    
-                task.wait(25)
-    
-                if not got_writing then
+                elseif not got_writing then
                     library:Notify("No Writing")
                     print("No Writing")
                     no_writing = true
