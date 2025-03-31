@@ -453,7 +453,7 @@ if started_round then
                     local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
                 end
     
-                task.wait(15)
+                task.wait(25)
     
                 if not got_writing then
                     library:Notify("No Writing")
