@@ -359,7 +359,7 @@ if started_round then
                     local_player.Character.HumanoidRootPart.CFrame = equipment.PrimaryPart.CFrame + Vector3.new(0, 5, 0)
                     replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("PickupItem"):InvokeServer(equipment)
                     local_player.Character.HumanoidRootPart.CFrame = ghost_room
-                    camera.CFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + Vector3.new(1, -2, 0))
+                    camera.CFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + Vector3.new(1, -2.5, 0))
                     task.wait(0.75)
                     mouse1click()
                 end
@@ -416,14 +416,14 @@ if started_round then
                 local_player.Character.HumanoidRootPart.CFrame = equipment.PrimaryPart.CFrame + Vector3.new(0, 5, 0)
                 replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("PickupItem"):InvokeServer(equipment)
                 local_player.Character.HumanoidRootPart.CFrame = ghost_room
-                camera.CFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + Vector3.new(-1, -2, 0))
+                camera.CFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + Vector3.new(-1, -2.5, 0))
                 task.wait(0.75)
                 mouse1click()
 
                 task.wait(5)
 
                 local_player.Character.HumanoidRootPart.CFrame = CFrame.new(-223, 166, -213)
-                local book = workspace.Equipment.Book
+                local book = workspace.Equipment:FindFirstChild("Book")
 
                 if not book then
                     local_player:Kick("Book not found! please report this to @kylosilly on discord!")
