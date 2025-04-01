@@ -166,7 +166,7 @@ if checked_info then
     end
 end
 
-task.wait(5)
+task.wait(2.5)
 
 if collected_bone then
     local last_pos = local_player.Character.HumanoidRootPart.CFrame
@@ -183,7 +183,7 @@ if collected_bone then
     end
 end
 
-task.wait(10)
+task.wait(2.5)
 
 if started_round then
     for _, equipment in next, van_equipment:GetChildren() do
@@ -390,22 +390,23 @@ if started_round then
                 teleport_service:Teleport(8267733039)
             end
 
-            task.wait(60)
+            library:Notify("Waiting For Writing (This Can Take Up To 2 Minutes So Be Patient)")
+
+            task.wait(120)
 
             if book:FindFirstChild("LeftPage") and book.LeftPage:FindFirstChildOfClass("Decal") and book:FindFirstChild("RightPage") and book.RightPage:FindFirstChildOfClass("Decal") then
                 library:Notify("Found Writing")
                 print("Got Writing")
                 got_writing = true
+                local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
             else
                 library:Notify("No Writing")
                 print("No Writing")
                 no_writing = true
+                local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
             end
         end
     end
-
-    library:Notify("Waiting 20 More Seconds For Sink To Get Dirty Water Or Waiting For Evidence To Spawn...")
-    task.wait(20)
 
     for _, sink in next, sinks:GetChildren() do
         if sink.Transparency < 1 then
@@ -576,10 +577,51 @@ if started_round then
         task.wait(0.25)
         fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     else
-        library:Notify("Couldnt Guess Ghost As It Lacks Evidence. You Have 15 Seconds To Guess The Ghost Before Teleporting Back To Lobby!")
-        task.wait(15)
-        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
-        task.wait(0.25)
-        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
+        library:Notify("Couldnt Find Ghost. Waiting 3 Minutes To Try Again")
+        local book = workspace.Equipment.Book
+        task.wait(160)
+
+        if book:FindFirstChild("LeftPage") and book.LeftPage:FindFirstChildOfClass("Decal") and book:FindFirstChild("RightPage") and book.RightPage:FindFirstChildOfClass("Decal") then
+            library:Notify("Found Writing")
+            print("Got Writing")
+            got_writing = true
+            local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+        else
+            library:Notify("No Writing")
+            print("No Writing")
+            no_writing = true
+            local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+        end
+
+        if got_emf_five and got_fingerprint and got_orb then
+            library:Notify("Ghost is: O Tonka")
+            replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("O Tokata")
+            local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+            task.wait(0.25)
+            fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
+        elseif got_spirit_box and got_writing and got_emf_five then
+            library:Notify("Ghost is: Mimic")
+            replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Mimic")
+            local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+            task.wait(0.25)
+            fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
+        elseif got_orb and got_fingerprint and got_writing then
+            library:Notify("Ghost is: Wisp")
+            replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Wisp")
+            local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+            task.wait(0.25)
+            fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
+        elseif got_motion and got_fingerprint and got_writing then
+            library:Notify("Ghost is: Douen")
+            replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlayerService"):WaitForChild("RF"):WaitForChild("UpdateGuess"):InvokeServer("Douen")
+            local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+            task.wait(0.25)
+            fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
+        else
+            library:Notify("Couldnt Find Ghost, Going Back To Menu")
+            local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+            task.wait(0.25)
+            fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
+        end
     end
 end
