@@ -8,7 +8,7 @@ task.wait(5)
 
 local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua'))()
 
-local Version = "V1.5.0"
+local Version = "V1.7.0"
 
 library:Notify("Loaded Auto Farm. Current Version: " .. Version)
 library:Notify("Auto Farm Made By @kylosilly On Discord <3")
@@ -64,8 +64,13 @@ local check_orb = true
 local got_room = false
 
 local ghost_room = nil
+local room_name = nil
 
 --// Main Script (Dont Modify Anything Under Here Unless You Know What Youre Doing)
+
+if not hookmetamethod then
+    local_player:Kick("Your Executor Dosent Support HookMetaMethod")
+end
 
 lighting.ClockTime = 12
 lighting.GlobalShadows = false
@@ -197,7 +202,7 @@ if started_round then
 
     if collected_equipment then
         virtual_input_manager:SendKeyEvent(true, Enum.KeyCode.Two, false, nil)
-        task.wait(.1)
+        task.wait(.25)
         local emf_tool = local_player.Character:FindFirstChild("EquipmentModel") and local_player.Character.EquipmentModel:FindFirstChild("2")
         local emf = local_player.Character:FindFirstChild("EquipmentModel") and local_player.Character.EquipmentModel:FindFirstChild("1")
 
@@ -222,6 +227,7 @@ if started_round then
 
                     if emf_tool.Color == Color3.fromRGB(131, 156, 49) then
                         ghost_room = hitbox.CFrame
+                        room_name = room.Name
                         got_room = true
                         library:Notify("Got ghost room: " .. room.Name .. " (It Not Might Be Always The Ghost Room!)")
                         break
@@ -238,8 +244,23 @@ if started_round then
     end
 
     if got_room then
+        if hookmetamethod then
+            library:Notify("Hooking LocalPlayer Room Value To Ghost Room...")
+            local old
+            old = hookmetamethod(game, "__namecall", function(self, ...)
+                local args = {...}
+                local method = getnamecallmethod()
+    
+                if method == "InvokeServer" and self.Name == "UpdateRoom" and not checkcaller() then
+                    args[1] = room_name
+                    return old(self, unpack(args))
+                end
+                return old(self, ...)
+            end)
+        end    
+
         virtual_input_manager:SendKeyEvent(true, Enum.KeyCode.One, false, nil)
-        task.wait(.1)
+        task.wait(.25)
         local thermometer = local_player.Character and local_player.Character:FindFirstChild("EquipmentModel") and local_player.Character.EquipmentModel:FindFirstChild("Temp") and local_player.Character.EquipmentModel.Temp:FindFirstChild("SurfaceGui") and local_player.Character.EquipmentModel.Temp.SurfaceGui:FindFirstChild("TextLabel")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("Toggle"):InvokeServer("Thermometer")
 
@@ -269,7 +290,7 @@ if started_round then
 
     if (got_freezing or no_freezing) then
         virtual_input_manager:SendKeyEvent(true, Enum.KeyCode.Three, false, nil)
-        task.wait(.1)
+        task.wait(.25)
         local spirit_box = local_player.Character and local_player.Character:FindFirstChild("EquipmentModel") and local_player.Character.EquipmentModel:FindFirstChild("Main")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("Toggle"):InvokeServer("Spirit Box")
 
@@ -360,8 +381,6 @@ if started_round then
             mouse1click()
             task.wait(.1)
 
-            task.wait(30)
-
             local book = workspace.Equipment.Book
             local_player.Character.HumanoidRootPart.CFrame = CFrame.new(-223, 166, -213)
 
@@ -371,7 +390,7 @@ if started_round then
                 teleport_service:Teleport(8267733039)
             end
 
-            task.wait(40)
+            task.wait(60)
 
             if book:FindFirstChild("LeftPage") and book.LeftPage:FindFirstChildOfClass("Decal") and book:FindFirstChild("RightPage") and book.RightPage:FindFirstChildOfClass("Decal") then
                 library:Notify("Found Writing")
@@ -557,7 +576,8 @@ if started_round then
         task.wait(0.25)
         fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     else
-        library:Notify("Couldnt Guess Ghost As It Lacks Evidence")
+        library:Notify("Couldnt Guess Ghost As It Lacks Evidence. You Have 15 Seconds To Guess The Ghost Before Teleporting Back To Lobby!")
+        task.wait(15)
         local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
         task.wait(0.25)
         fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
