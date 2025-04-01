@@ -1,4 +1,4 @@
---// This Is Version V1.0.0 Of The Auto Farm. Please Report Bugs To @kylosilly On Discord
+--// This Is Version V1.7.0 Of The Auto Farm. Please Report Bugs To @kylosilly On Discord
 
 local scripts = 'https://raw.githubusercontent.com/kylosilly/astolfoware/main/scripts/'
 
