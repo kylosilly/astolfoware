@@ -576,6 +576,10 @@ if started_round then
         task.wait(0.25)
         fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     else
-        library:Notify("Couldnt Guess Ghost As It Lacks Evidence")
+        library:Notify("Couldnt Guess Ghost As It Lacks Evidence. You Have 15 Seconds To Guess The Ghost Before Teleporting Back To Lobby!")
+        task.wait(15)
+        local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
+        task.wait(0.25)
+        fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
     end
 end
