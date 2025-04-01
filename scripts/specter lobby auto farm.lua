@@ -10,8 +10,16 @@ library:Notify("Adding a option soon to use modifiers")
 
 local replicated_storage = game:GetService("ReplicatedStorage")
 local local_player = game:GetService("Players").LocalPlayer
+local Version = "V1.5.0"
 
-library:Notify("Ran Auto Farm Script Current Version: V1.2.0")
+library:Notify("Ran Auto Farm Script Current Version: " .. Version)
+
+if tonumber(local_player.PlayerGui.Stats.Frame.Content.Stats.Level.Value.Text) > 99 then
+    library:Notify("Player Can Prestige, Prestiging...")
+    replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PrestigeService"):WaitForChild("RF"):WaitForChild("Prestige"):InvokeServer()
+else
+    library:Notify("Player Cannot Prestige Continuing...")
+end
 
 if local_player then
     replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("LobbyService"):WaitForChild("RF"):WaitForChild("CreateLobby"):InvokeServer("Auto Farm Made By @kylosilly", 1, 0, "Private")
