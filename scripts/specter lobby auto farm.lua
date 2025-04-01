@@ -202,7 +202,7 @@ if started_round then
 
     if collected_equipment then
         virtual_input_manager:SendKeyEvent(true, Enum.KeyCode.Two, false, nil)
-        task.wait(.1)
+        task.wait(.25)
         local emf_tool = local_player.Character:FindFirstChild("EquipmentModel") and local_player.Character.EquipmentModel:FindFirstChild("2")
         local emf = local_player.Character:FindFirstChild("EquipmentModel") and local_player.Character.EquipmentModel:FindFirstChild("1")
 
@@ -260,7 +260,7 @@ if started_round then
         end    
 
         virtual_input_manager:SendKeyEvent(true, Enum.KeyCode.One, false, nil)
-        task.wait(.1)
+        task.wait(.25)
         local thermometer = local_player.Character and local_player.Character:FindFirstChild("EquipmentModel") and local_player.Character.EquipmentModel:FindFirstChild("Temp") and local_player.Character.EquipmentModel.Temp:FindFirstChild("SurfaceGui") and local_player.Character.EquipmentModel.Temp.SurfaceGui:FindFirstChild("TextLabel")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("Toggle"):InvokeServer("Thermometer")
 
@@ -290,7 +290,7 @@ if started_round then
 
     if (got_freezing or no_freezing) then
         virtual_input_manager:SendKeyEvent(true, Enum.KeyCode.Three, false, nil)
-        task.wait(.1)
+        task.wait(.25)
         local spirit_box = local_player.Character and local_player.Character:FindFirstChild("EquipmentModel") and local_player.Character.EquipmentModel:FindFirstChild("Main")
         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("InventoryService"):WaitForChild("RF"):WaitForChild("Toggle"):InvokeServer("Spirit Box")
 
