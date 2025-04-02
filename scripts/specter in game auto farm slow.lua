@@ -619,7 +619,7 @@ if started_round then
             fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
         else
             library:Notify("Couldnt Find Ghost, Going Back To Menu")
-            local_player.Character.HumanoidRootPart.CFrame = van.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
+            local_player.Character.HumanoidRootPart.CFrame = van_button.CFrame
             task.wait(0.25)
             fireproximityprompt(van_button:FindFirstChildOfClass("ProximityPrompt"))
         end
