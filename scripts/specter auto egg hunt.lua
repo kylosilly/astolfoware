@@ -13,7 +13,7 @@ local oven = workspace.Map.EE:FindFirstChild("Oven")
 local chocolates = workspace.Map.EE:FindFirstChild("Chocolate")
 local electronics = workspace.Map.EventObjects.Electronics
 
-if workspace.Map:GetAttribute("MapName") == "Lodge" and #players:GetPlayers() < 1 then
+if workspace.Map:GetAttribute("MapName") == "Lodge" and #players:GetPlayers() < 2 then
     local_player:Kick("2 Players Required To Collect This Badge!")
 end
 
