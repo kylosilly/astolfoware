@@ -1,4 +1,3 @@
-
 -- Feel free to use this loader source 🐾 <3
 local lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua'))()
 loadstring(game:HttpGet('https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/scripts/ChatTag.lua'))()
@@ -29,6 +28,9 @@ elseif info.Name == "SPECTER Classic [AI]" then
     lib:Notify('Supported game loading: ' .. info.Name)
 elseif place_id == 14056802186 then
     loadstring(game:HttpGet(scripts.."SpecterTrading.lua"))()
+    lib:Notify('Supported game loading: ' .. info.Name)
+elseif place_id == 85896571713843 then
+    loadstring(game:HttpGet(scripts.."bgsi.lua"))()
     lib:Notify('Supported game loading: ' .. info.Name)
 else
     lib:Notify('Game not supported: ' .. info.Name .. ' if you wanna support this game join the discord copied to your clipboard')
