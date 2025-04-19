@@ -1,3 +1,5 @@
+--// if your pro code skid heres my dupe: https://github.com/kylosilly/astolfoware/blob/main/scripts/bgsidupe.lua
+
 if not game:IsLoaded() then
     print("Waiting for game to load...")
     game.Loaded:Wait()
@@ -16,7 +18,7 @@ local library = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BLibrary%5D'))()
 local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManager%5D'))()
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
-local version = "V2.0.0"
+local version = "V2.1.0"
 
 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Intro") then
     library:Notify("Start the game first before using the script!")
@@ -24,7 +26,7 @@ if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Intro") then
 end
 
 local window = library:CreateWindow({
-    Title = 'Astolfo Ware | Private | Made By @kylosilly | Version: ' .. version,
+    Title = 'Astolfo Ware | Public | Made By @kylosilly | Version: ' .. version,
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -45,7 +47,6 @@ local auto_hatch_group = tabs.main:AddLeftGroupbox('Auto Hatch Settings')
 local teleport_group = tabs.main:AddRightGroupbox('Teleport Settings')
 local auto_group = tabs.auto:AddLeftGroupbox('Auto Settings')
 local auto_use_group = tabs.auto:AddRightGroupbox('Auto Use Settings')
-local auto_shop_group = tabs.auto:AddLeftGroupbox('Auto Shop Settings')
 local webhook_group = tabs.webhook:AddLeftGroupbox('Webhook Settings')
 local update_group = tabs.update:AddLeftGroupbox('Update Settings')
 local menu_group = tabs['ui settings']:AddLeftGroupbox('Menu')
@@ -55,8 +56,10 @@ local replicated_storage = game:GetService('ReplicatedStorage')
 local tween_service = game:GetService('TweenService')
 local market = game:GetService('MarketplaceService')
 local http_service = game:GetService('HttpService')
+local virtual_user = game:GetService('VirtualUser')
 local run_service = game:GetService('RunService')
 local info = market:GetProductInfo(game.PlaceId)
+local getgc = getconnections or get_signal_cons
 local workspace = game:GetService('Workspace')
 local players = game:GetService('Players')
 local local_player = players.LocalPlayer
@@ -65,10 +68,11 @@ local stats = game:GetService('Stats')
 local local_data = require(replicated_storage.Client.Framework.Services.LocalData)
 local remote = require(replicated_storage.Shared.Framework.Network.Remote)
 local shiny_utility = require(replicated_storage.Shared.Utils.ShinyUtil)
+local pet_level = require(replicated_storage.Shared.Utils.PetLevelUtil)
 local stat = require(replicated_storage.Shared.Utils.Stats.StatsUtil)
 local codes = require(replicated_storage.Shared.Data.Codes)
 
-local islands = workspace.Worlds["The Overworld"].Islands
+local overworld_islands = workspace.Worlds["The Overworld"].Islands
 local pickables = workspace.Rendered:GetChildren()[14]
 local eggs = replicated_storage.Assets.Eggs
 local chest = workspace.Rendered.Chests
@@ -99,6 +103,7 @@ local auto_sell = false
 local log_eggs = false
 local stop_at = false
 
+local collect_method = "Remote"
 local selected_island = ""
 local selected_potion = ""
 local selected_shop = ""
@@ -108,7 +113,7 @@ local selected_pet = ""
 local selected_enchant_slot = 1
 local selected_potion_tier = 1
 local potion_use_delay = 1
-local collect_speed = 0
+local collect_speed = 0.5
 local open_amount = 10
 
 local island_names = {}
@@ -169,9 +174,14 @@ for _, v in next, eggs:GetChildren() do
     end
 end
 
-for _, v in next, islands:GetChildren() do
+for _, v in next, overworld_islands:GetChildren() do
     table.insert(island_names, v.Name)
 end
+
+--[[
+function get_diddys_pet()
+    for _, v in next,
+]]
 
 rifts.ChildAdded:Connect(function(egg)
     task.wait(1)
@@ -212,6 +222,12 @@ rifts.ChildAdded:Connect(function(egg)
             data["content"] = roles["Easter Egg"] .. " | Bunny Egg Spawned!"
         elseif egg.Name == "event-1" and roles["Easter Egg"] == "" then
             data["content"] = "@everyone | Bunny Egg Spawned!"
+        end
+
+        if egg.Name == "event-2" and roles["Easter Egg"] ~= "" then
+            data["content"] = roles["Easter Egg"] .. " | Pastel Egg Spawned!"
+        elseif egg.Name == "event-2" and roles["Easter Egg"] == "" then
+            data["content"] = "@everyone | Man Egg Spawned!"
         end
 
         if egg.Display.SurfaceGui.Icon.Luck.Text == "x25" and roles["x25"] ~= "" then
@@ -377,6 +393,7 @@ farm_group:AddToggle('auto_blow', {
             if auto_blow then
                 remote:FireServer("BlowBubble")
             end
+            task.wait(.5)
         end
     end
 })
@@ -391,6 +408,7 @@ farm_group:AddToggle('auto_sell', {
             if auto_sell then
                 remote:FireServer("SellBubble")
             end
+            task.wait(.5)
         end
     end
 })
@@ -450,8 +468,9 @@ farm_group:AddToggle('auto_collect', {
             replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands.Zen.Island.Portal.Spawn")
         end
         task.wait(2.5)
+
         while task.wait() do
-            if auto_collect then
+            if auto_collect and collect_method == "Tp" then
                 for _, v in next, pickables:GetChildren() do
                     if v:IsA("Model") then
                         local part = v:FindFirstChildWhichIsA("Part") or v:FindFirstChildWhichIsA("MeshPart")
@@ -459,6 +478,14 @@ farm_group:AddToggle('auto_collect', {
                             local_player.Character.HumanoidRootPart.CFrame = part.CFrame
                             task.wait(collect_speed)
                         end
+                    end
+                end
+            elseif auto_collect and collect_method == "Remote" then
+                for _, v in next, pickables:GetChildren() do
+                    if v:IsA("Model") then
+                        replicated_storage:WaitForChild("Remotes"):WaitForChild("Pickups"):WaitForChild("CollectPickup"):FireServer(v.Name)
+                        v:Destroy()
+                        task.wait(collect_speed)
                     end
                 end
             end
@@ -483,12 +510,25 @@ farm_group:AddToggle('stop_at_max', {
 })
 farm_group:AddSlider('auto_collect_speed', {
     Text = 'Auto Collect Speed',
-    Default = 0,
-    Min = 0,
+    Default = 0.5,
+    Min = 0.5,
     Max = 5,
     Rounding = 0,
     Callback = function(Value)
         collect_speed = Value
+    end
+})
+
+farm_group:AddDropdown('collect_method', {
+    Values = { 'Tp', 'Remote' },
+    Default = "Remote",
+    Multi = false,
+
+    Text = 'Select Collect Method',
+    Tooltip = 'Select one of these methods to collect stuff idk',
+
+    Callback = function(Value)
+        collect_method = Value
     end
 })
 
@@ -515,9 +555,32 @@ misc_group:AddButton({
 })
 
 misc_group:AddButton({
+    Text = 'Anti Afk',
+    Func = function()
+        if getgc then
+            for _, v in next, getgc(local_player.Idled) do
+                if v["Disable"] then
+                    v["Disable"](v)
+                elseif v["Disconnect"] then
+                    v["Disconnect"](v)
+                end
+            end
+        else
+            local_player.Idled:Connect(function()
+                virtual_user:CaptureController()
+                virtual_user:ClickButton2(Vector2.new())
+            end)
+        end
+        library:Notify("Anti Afk Enabled! (Credits to inf yield)")
+    end,
+    DoubleClick = false,
+    Tooltip = 'Credits to inf yield <3',
+})
+
+misc_group:AddButton({
     Text = 'Unlock islands',
     Func = function()
-        for _, v in next, islands:GetDescendants() do
+        for _, v in next, overworld_islands:GetDescendants() do
             if v.Name == "UnlockHitbox" then
                 for i = 1, 5 do
                     firetouchinterest(local_player.Character.HumanoidRootPart, v, 0)
@@ -564,7 +627,7 @@ auto_hatch_group:AddToggle('auto_hatch', {
             tween.Completed:Wait()
             local to = workspace.Rendered:GetChildren()[13]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
             local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
-            local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 30, Enum.EasingStyle.Linear), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 5, 0)})
+            local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 5, 0)})
             tween:Play()
             tween.Completed:Wait()
         elseif Value and not (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg") then
@@ -575,7 +638,7 @@ auto_hatch_group:AddToggle('auto_hatch', {
             tween.Completed:Wait()
             local to = workspace.Rendered:GetChildren()[13]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
             local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
-            local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 30, Enum.EasingStyle.Linear), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 5, 0)})
+            local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 5, 0)})
             tween:Play()
             tween.Completed:Wait()
         end
@@ -583,6 +646,7 @@ auto_hatch_group:AddToggle('auto_hatch', {
         while task.wait() do
             if auto_hatch then
                 remote:FireServer("HatchEgg", selected_egg, 99)
+                task.wait(stat:GetHatchSpeed(data))
             end
         end
     end
@@ -622,12 +686,13 @@ auto_group:AddToggle('auto_doggy', {
     Tooltip = 'Auto Claims Doggy Jump Minigame',
     Callback = function(Value)
         auto_doggy = Value
-        while task.wait(5) do
+        while task.wait() do
             if auto_doggy then
                 for i = 1, 3 do
                     remote:FireServer("DoggyJumpWin", i)
                     task.wait(.25)
                 end
+                task.wait(5)
             end
         end
     end
@@ -641,11 +706,12 @@ auto_group:AddToggle('auto_claim_chest', {
     Tooltip = 'Auto Claims Chest',
     Callback = function(Value)
         auto_chest = Value
-        while task.wait(5) do
+        while task.wait() do
             if auto_chest then
                 for _, v in next, chest:GetChildren() do
                     remote:FireServer("ClaimChest", v.Name, true)
                 end
+                task.wait(5)
             end
         end
     end
@@ -657,13 +723,14 @@ auto_group:AddToggle('auto_claim_playtime', {
     Tooltip = 'Auto Claims Playtime Rewards',
     Callback = function(Value)
         auto_playtime = Value
-        while task.wait(5) do
+        while task.wait() do
             if auto_playtime then
                 for i = 1, 9 do
-                    replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("ClaimPlaytime", i)
-                    replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Function"):InvokeServer("ClaimPlaytime", i)
+                    remote:FireServer("ClaimPlaytime", i)
+                    remote:InvokeServer("ClaimPlaytime", i)
                     task.wait()
                 end
+                task.wait(5)
             end
         end
     end
@@ -675,10 +742,11 @@ auto_group:AddToggle('auto_claim_tickets', {
     Tooltip = 'Auto Claims Tickets',
     Callback = function(Value)
         auto_ticket = Value
-        while task.wait(5) do
+        while task.wait() do
             if auto_ticket then
-                replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("ClaimFreeWheelSpin")
+                remote:FireServer("ClaimFreeWheelSpin")
             end
+            task.wait(5)
         end
     end
 })
@@ -689,11 +757,12 @@ auto_group:AddToggle('auto_spin_wheel', {
     Tooltip = 'Auto Spins Wheel',
     Callback = function(Value)
         auto_wheel = Value
-        while task.wait(5) do
+        while task.wait() do
             if auto_wheel then
-                replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Function"):InvokeServer("WheelSpin")
-                replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("ClaimWheelSpinQueue")
+                remote:InvokeServer("WheelSpin")
+                remote:FireServer("ClaimWheelSpinQueue")
             end
+            task.wait(5)
         end
     end
 })
@@ -706,7 +775,7 @@ auto_group:AddToggle('auto_claim_seasonal', {
         auto_season = Value
         while task.wait(5) do
             if auto_season then
-                replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("ClaimSeason")
+                remote:FireServer("ClaimSeason")
             end
         end
     end
@@ -757,7 +826,7 @@ auto_use_group:AddToggle('auto_potion', {
         auto_potion = Value
         while task.wait() do
             if auto_potion then
-                replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("UsePotion", selected_potion, selected_potion_tier)
+                remote:FireServer("UsePotion", selected_potion, selected_potion_tier)
                 library:Notify('Used ' .. selected_potion .. ' tier ' .. selected_potion_tier)
                 task.wait(potion_use_delay)
             end
@@ -775,7 +844,7 @@ auto_use_group:AddToggle('auto_gold_orb', {
         auto_gold_orb = Value
         while task.wait() do
             if auto_gold_orb then
-                replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("UseGoldenOrb")
+                remote:FireServer("UseGoldenOrb")
                 task.wait(900)
             end
         end
@@ -1059,12 +1128,9 @@ webhook_group:AddInput('easter_egg_ping', {
     end
 })
 
-update_group:AddLabel('Version V2.0.0 Updates:')
-update_group:AddLabel('[+] Added Webhook Logging')
-update_group:AddLabel('[+] Added Auto Egg Open')
-update_group:AddLabel('[-] Remove Enchants (Until Rewroten)', true)
-update_group:AddLabel('[+] Rewrote Script')
-update_group:AddLabel('[+] Fixed Issues')
+update_group:AddLabel('Version V2.1.0 Updates:')
+update_group:AddLabel('[+] Added New Collect Method (Remote)', true)
+update_group:AddLabel('[+] Added Anti Afk', true)
 
 local FrameTimer = tick()
 local FrameCounter = 0;
