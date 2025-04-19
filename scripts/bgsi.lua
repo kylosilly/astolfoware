@@ -45,6 +45,7 @@ local auto_hatch_group = tabs.main:AddLeftGroupbox('Auto Hatch Settings')
 local teleport_group = tabs.main:AddRightGroupbox('Teleport Settings')
 local auto_group = tabs.auto:AddLeftGroupbox('Auto Settings')
 local auto_use_group = tabs.auto:AddRightGroupbox('Auto Use Settings')
+local auto_shop_group = tabs.auto:AddLeftGroupbox('Auto Shop Settings')
 local webhook_group = tabs.webhook:AddLeftGroupbox('Webhook Settings')
 local update_group = tabs.update:AddLeftGroupbox('Update Settings')
 local menu_group = tabs['ui settings']:AddLeftGroupbox('Menu')
@@ -100,6 +101,7 @@ local stop_at = false
 
 local selected_island = ""
 local selected_potion = ""
+local selected_shop = ""
 local selected_egg = ""
 local selected_pet = ""
 
@@ -135,6 +137,11 @@ local enchantments = {
     "✨ Gleaming III"
 }
 
+local shops = {
+    "Alien Shop",
+    "Shard Shop"
+}
+
 local webhooks = {
     eggs = "",
     chests = "",
@@ -145,7 +152,8 @@ local webhooks = {
 local roles = {
     ["x25"] = "",
     ["Man Egg"] = "",
-    ["Royale Chest"] = ""
+    ["Royale Chest"] = "",
+    ["Easter Egg"] = ""
 }
 
 local potions = {
@@ -167,7 +175,7 @@ end
 
 rifts.ChildAdded:Connect(function(egg)
     task.wait(1)
-    if egg.Name:find("egg") and enable_webhook and log_eggs then
+    if (egg.Name:find("egg") or egg.Name:find("event")) and enable_webhook and log_eggs then
         local data = {
             ["username"] = "Notifier Made By @kylosilly",
             ["embeds"] = {
@@ -198,6 +206,12 @@ rifts.ChildAdded:Connect(function(egg)
             data["content"] = roles["Man Egg"]
         elseif egg.Name == "man-egg" and roles ["Man Egg"] == "" then
             data["content"] = "@everyone"
+        end
+
+        if egg.Name == "event-1" and roles["Easter Egg"] ~= "" then
+            data["content"] = roles["Easter Egg"] .. " | Bunny Egg Spawned!"
+        elseif egg.Name == "event-1" and roles["Easter Egg"] == "" then
+            data["content"] = "@everyone | Bunny Egg Spawned!"
         end
 
         if egg.Display.SurfaceGui.Icon.Luck.Text == "x25" and roles["x25"] ~= "" then
@@ -370,7 +384,7 @@ farm_group:AddToggle('auto_blow', {
 farm_group:AddToggle('auto_sell', {
     Text = 'Auto Sell Bubbles',
     Default = false,
-    Tooltip = 'Auto Sells Your Bubbles',
+    Tooltip = 'Auto Sells Your Bubbles (MUST BE CLOSE TO A SELLZONE)',
     Callback = function(Value)
         auto_sell = Value
         while task.wait() do
@@ -435,7 +449,7 @@ farm_group:AddToggle('auto_collect', {
         if Value then
             replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands.Zen.Island.Portal.Spawn")
         end
-        task.wait(1)
+        task.wait(2.5)
         while task.wait() do
             if auto_collect then
                 for _, v in next, pickables:GetChildren() do
@@ -590,6 +604,11 @@ teleport_group:AddDropdown('island_selector', {
 teleport_group:AddButton({
     Text = 'Teleport to selected island',
     Func = function()
+        if selected_island == "" then
+            library:Notify("Please select an island")
+            return
+        end
+
         remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands." .. selected_island .. ".Island.Portal.Spawn")
         library:Notify('Teleported to ' .. selected_island)
     end,
@@ -816,7 +835,7 @@ webhook_group:AddToggle('log_eggs', {
         log_eggs = Value
         if Value and enable_webhook then
             for _, v in next, rifts:GetChildren() do
-                if v.Name:find("egg") then
+                if (v.Name:find("egg") or v.Name:find("event")) then
                     local c = v:Clone()
                     c.Parent = rifts
                     task.wait(2)
@@ -1020,6 +1039,22 @@ webhook_group:AddInput('royale_chest_ping', {
 
     Callback = function(Value)
         roles["royale"] = Value
+        library:Notify("Role ID set to: " .. Value)
+    end
+})
+
+webhook_group:AddInput('easter_egg_ping', {
+    Default = '',
+    Numeric = false,
+    Finished = true,
+
+    Text = 'Role To Ping If Easter Egg :',
+    Tooltip = 'You can leave this as blank if you want it to ping everyone',
+
+    Placeholder = '',
+
+    Callback = function(Value)
+        roles["Easter Egg"] = Value
         library:Notify("Role ID set to: " .. Value)
     end
 })
