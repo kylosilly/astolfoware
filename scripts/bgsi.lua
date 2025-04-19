@@ -9,7 +9,7 @@ end
 if getthreadcontext() > 7 then
     print("Executor Supported")
 else
-    game:GetService("Players").LocalPlayer:Kick("Unsupported Executor")
+    game:Shutdown()
 end
 
 local repo = 'https://raw.githubusercontent.com/KINGHUB01/Gui/main/'
