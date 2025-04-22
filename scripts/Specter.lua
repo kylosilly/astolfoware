@@ -11,7 +11,7 @@ if not game:IsLoaded() then
 end
 
 local window = library:CreateWindow({
-    Title = 'Astolfo Ware | https://discord.gg/U5yjDvsxHR | Made by @kylosilly',
+    Title = 'Astolfo Ware | https://discord.gg/SUTpER4dNc | Made by @kylosilly',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -1443,7 +1443,7 @@ credits_group:AddLabel('@kylosilly: Who made the script', true)
 credits_group:AddButton({
     Text = 'Join our discord!',
     Func = function()
-        setclipboard('https://discord.gg/frQv5QScXS')
+        setclipboard('https://discord.gg/SUTpER4dNc')
     end,
     DoubleClick = false,
     Tooltip = 'Join our official discord server.'
