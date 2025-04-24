@@ -630,7 +630,7 @@ auto_hatch_group:AddToggle('auto_hatch', {
             if Value and (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg" or selected_egg == "Throwback Egg") then
                 remote:FireServer("Teleport", "Workspace.Event.Portal.Spawn")
                 task.wait(.1)
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear), {CFrame = CFrame.new(workspace.Event.Model:GetChildren()[2]["Meshes/Egg Circle_Circle.053"].Position)})
+                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear), {CFrame = CFrame.new(workspace.Event.Model.Model["Meshes/Egg Circle_Circle.053"].Position)})
                 tween:Play()
                 tween.Completed:Wait()
                 local to = workspace.Rendered:GetChildren()[13]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
@@ -657,7 +657,7 @@ auto_hatch_group:AddToggle('auto_hatch', {
         while task.wait() do
             if auto_hatch then
                 remote:FireServer("HatchEgg", selected_egg, stat:GetMaxEggHatches(data))
-                task.wait(stat:GetHatchSpeed(data))
+                task.wait(stat:GetHatchSpeed(data) / 2)
             end
         end
     end
