@@ -596,7 +596,7 @@ misc_group:AddButton({
     Tooltip = 'Unlocks all islands',
 })
 
-auto_hatch_group:AddLabel('I dont recommend using auto goto lucky eggs as its buggy asf and im too lazy to fix it', true)
+auto_hatch_group:AddLabel('Removed Lucky Goto Eggs For Now Until Rewroten', true)
 
 auto_hatch_group:AddDropdown('egg_select', {
     Values = egg,
