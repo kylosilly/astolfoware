@@ -18,7 +18,7 @@ local library = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BLibrary%5D'))()
 local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManager%5D'))()
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
-local version = "V2.2.0"
+local version = "V2.3.0"
 
 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Intro") then
     library:Notify("Start the game first before using the script!")
@@ -82,6 +82,7 @@ local rifts = workspace.Rendered.Rifts
 local data = local_data:Get()
 
 local enable_webhook = false
+local auto_bubble_up = false
 local auto_gold_orb = false
 local auto_playtime = false
 local auto_collect = false
@@ -94,7 +95,6 @@ local equip_best = false
 local auto_hatch = false
 local auto_chest = false
 local auto_doggy = false
-local goto_luck = false
 local auto_gift = false
 local log_gifts = false
 local auto_open = false
@@ -104,16 +104,15 @@ local auto_sell = false
 local log_eggs = false
 local stop_at = false
 
+local selected_gift = "Mystery Box"
 local collect_method = "Remote"
 local selected_island = ""
 local selected_potion = ""
-local selected_shop = ""
-local selected_luck = "x5"
 local selected_egg = ""
-local selected_pet = ""
 
 local selected_enchant_slot = 1
 local selected_potion_tier = 1
+local chest_open_delay = 1
 local potion_use_delay = 1
 local collect_speed = 0.5
 local open_amount = 10
@@ -224,6 +223,12 @@ rifts.ChildAdded:Connect(function(egg)
         if egg.Name == "event-2" and roles["Easter Egg"] ~= "" then
             data["content"] = roles["Easter Egg"] .. " | Pastel Egg Spawned!"
         elseif egg.Name == "event-2" and roles["Easter Egg"] == "" then
+            data["content"] = "@everyone | Pastel Egg Spawned!"
+        end
+
+        if egg.Name == "event-3" and roles["Easter Egg"] ~= "" then
+            data["content"] = roles["Easter Egg"] .. " | Throwback Egg Spawned!"
+        elseif egg.Name == "event-3" and roles["Easter Egg"] == "" then
             data["content"] = "@everyone | Man Egg Spawned!"
         end
 
@@ -377,33 +382,6 @@ players.PlayerRemoving:Connect(function(player)
             },
             Body = http_service:JSONEncode(data)
         })
-    end
-end)
-
-rifts.ChildAdded:Connect(function(lucky_egg)
-    task.wait(1)
-    if goto_luck and lucky_egg.Name == selected_egg and lucky_egg:FindFirstChild("Display"):FindFirstChild("SurfaceGui"):FindFirstChild("Icon"):FindFirstChild("Luck").ContentText == selected_luck then
-
-        for _, v in next, rifts:GetChildren() do
-            if v.Name == "event-1" then
-                v.Name = "Bunny Egg"
-            elseif v.Name == "event-2" then
-                v.Name = "Pastel Egg"
-            elseif v.Name:find("egg") then
-                local parts = string.split(v.Name, "-")
-                for i, part in ipairs(parts) do
-                    parts[i] = part:gsub("^%l", string.upper)
-                end
-                v.Name = table.concat(parts, " ")
-            end
-        end
-
-        goto_egg()
-
-        repeat task.wait(1)
-        until lucky_egg:GetAttribute("DespawnAt") > os.time() or not lucky_egg
-
-        goto_egg()
     end
 end)
 
@@ -606,10 +584,10 @@ misc_group:AddButton({
     Func = function()
         for _, v in next, overworld_islands:GetDescendants() do
             if v.Name == "UnlockHitbox" then
-                for i = 1, 5 do
+                for i = 1, 10 do
                     firetouchinterest(local_player.Character.HumanoidRootPart, v, 0)
                     firetouchinterest(local_player.Character.HumanoidRootPart, v, 1)
-                    task.wait()
+                    task.wait(.1)
                 end
             end
         end
@@ -649,17 +627,7 @@ auto_hatch_group:AddToggle('auto_hatch', {
         end
 
         function goto_egg()
-            if Value and goto_luck and rifts:FindFirstChild(selected_egg) and rifts:FindFirstChild(selected_egg):FindFirstChild("Display"):FindFirstChild("SurfaceGui"):FindFirstChild("Icon"):FindFirstChild("Luck").ContentText == selected_luck then
-                remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
-                task.wait(.1)
-                local position = Vector3.new(rifts[selected_egg].Display.Position.X, local_player.Character.HumanoidRootPart.Position.Y, rifts[selected_egg].Display.Position.Z)
-                local distance = (local_player.Character.HumanoidRootPart.Position - position).magnitude
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear), {CFrame = CFrame.new(position)})
-                tween:Play()
-                tween.Completed:Wait()
-                local_player.Character.HumanoidRootPart.CFrame = CFrame.new(rifts[selected_egg].Display.Position)
-                return
-            elseif Value and (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg") then
+            if Value and (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg" or selected_egg == "Throwback Egg") then
                 remote:FireServer("Teleport", "Workspace.Event.Portal.Spawn")
                 task.wait(.1)
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear), {CFrame = CFrame.new(workspace.Event.Model:GetChildren()[2]["Meshes/Egg Circle_Circle.053"].Position)})
@@ -691,56 +659,6 @@ auto_hatch_group:AddToggle('auto_hatch', {
                 remote:FireServer("HatchEgg", selected_egg, stat:GetMaxEggHatches(data))
                 task.wait(stat:GetHatchSpeed(data))
             end
-        end
-    end
-})
-
-auto_hatch_group:AddDivider()
-
-auto_hatch_group:AddDropdown('luck_selector', {
-    Values = { 'x5', 'x10', 'x25' },
-    Default = "x5",
-    Multi = false,
-
-    Text = 'Select Luck',
-    Tooltip = 'Select a luck so if an egg has the luck it tps to it',
-
-    Callback = function(Value)
-        selected_luck = Value
-    end
-})
-
-auto_hatch_group:AddToggle('goto_luck', {
-    Text = 'Goto Lucky Egg',
-    Default = false,
-    Tooltip = 'Goto Lucky Egg',
-    Callback = function(Value)
-        goto_luck = Value
-        
-        if selected_egg == "" then
-            library:Notify("Please select an egg before doing this")
-            goto_luck = false
-            return
-        end
-
-        for _, v in next, rifts:GetChildren() do
-            if v.Name == "event-1" then
-                v.Name = "Bunny Egg"
-            elseif v.Name == "event-2" then
-                v.Name = "Pastel Egg"
-            elseif v.Name:find("egg") then
-                local parts = string.split(v.Name, "-")
-                for i, part in ipairs(parts) do
-                    parts[i] = part:gsub("^%l", string.upper)
-                end
-                v.Name = table.concat(parts, " ")
-            end
-        end
-
-        task.wait(1)
-        
-        if v.Name == selected_egg and v:FindFirstChild("Display") and v.Display:FindFirstChild("SurfaceGui") and v.Display.SurfaceGui:FindFirstChild("Icon") and v.Display.SurfaceGui.Icon:FindFirstChild("Luck") and v.Display.SurfaceGui.Icon.Luck.ContentText == selected_luck then
-            goto_egg()
         end
     end
 })
@@ -866,10 +784,26 @@ auto_group:AddToggle('auto_claim_seasonal', {
     Tooltip = 'Auto Claims Season Rewards',
     Callback = function(Value)
         auto_season = Value
-        while task.wait(5) do
+        while task.wait() do
             if auto_season then
                 remote:FireServer("ClaimSeason")
             end
+            task.wait(5)
+        end
+    end
+})
+
+auto_group:AddToggle('auto_claim_bubble_up', {
+    Text = 'Auto Claim Bubble Up',
+    Default = false,
+    Tooltip = 'Auto Claims Bubble Up',
+    Callback = function(Value)
+        auto_bubble_up = Value
+        while task.wait() do
+            if auto_bubble_up then
+                remote:FireServer("ChallengePassClaimReward")
+            end
+            task.wait(5)
         end
     end
 })
@@ -902,7 +836,7 @@ auto_use_group:AddDropdown('tier_dropdown', {
 
 auto_use_group:AddSlider('use_delay', {
     Text = 'Potion Use Delay',
-    Default = 1,
+    Default = potion_use_delay,
     Min = 0,
     Max = 10,
     Rounding = 0,
@@ -946,33 +880,58 @@ auto_use_group:AddToggle('auto_gold_orb', {
 
 auto_use_group:AddDivider()
 
+auto_use_group:AddDropdown('gift_method_selector', {
+    Values = { 'Mystery Box', 'Golden Box' },
+    Default = selected_gift,
+    Multi = false,
+
+    Text = 'Select Which Gift To Open:',
+    Tooltip = 'Select an gift you wanna auto open',
+
+    Callback = function(Value)
+        selected_gift = Value
+    end
+})
+
 auto_use_group:AddToggle('auto_open', {
-    Text = 'Auto Open Chests',
+    Text = 'Auto Gift Chests',
     Default = false,
     Tooltip = 'Auto Opens Chests',
     Callback = function(Value)
         auto_open = Value
         while task.wait() do
             if auto_open then
-                remote:FireServer("UseGift", "Mystery Box", open_amount)
-                task.wait(.1)
+                remote:FireServer("UseGift", selected_gift, open_amount)
+                task.wait()
                 for _, v in next, gifts:GetChildren() do
                     remote:FireServer("ClaimGift", v.Name)
                     v:Destroy()
                 end
+                task.wait(chest_open_delay)
             end
         end
     end
 })
 
 auto_use_group:AddSlider('auto_open_amount', {
-    Text = 'Auto Open Chests Amount',
-    Default = 10,
+    Text = 'Auto Open Gift Amount',
+    Default = open_amount,
     Min = 1,
     Max = 10,
     Rounding = 0,
     Callback = function(Value)
         open_amount = Value
+    end
+})
+
+auto_use_group:AddSlider('chest_open_delay', {
+    Text = 'Gift Open Delay',
+    Default = chest_open_delay,
+    Min = 0,
+    Max = 10,
+    Rounding = 0,
+    Callback = function(Value)
+        chest_open_delay = Value
     end
 })
 
@@ -1221,9 +1180,24 @@ webhook_group:AddInput('easter_egg_ping', {
     end
 })
 
-update_group:AddLabel('Version V2.2.0 Updates:')
-update_group:AddLabel('[+] Rewrote Auto Hatch')
-update_group:AddLabel('[+] Added Auto Got Lucky Eggs (Buggy asf dont use pls)', true)
+update_group:AddLabel('Version V2.3.0 Updates:')
+update_group:AddLabel('[+] Updated Webhook Eggs And Auto Hatch For Event Eggs', true)
+update_group:AddLabel('[+] Fixed the issue saying man egg spawned when pastel egg spawned', true)
+update_group:AddLabel('[+] Added Delay Option To Auto Gifts', true)
+update_group:AddLabel('[+] Added New Event Auto Claimer', true)
+update_group:AddLabel('[+] Fixed Small Issues', true)
+update_group:AddLabel('[-] Removed Auto Goto Lucky Eggs (Till Rewroten)', true)
+update_group:AddLabel('New Discord: https://discord.gg/xanDQj7X', true)
+
+update_group:AddButton({
+    Text = 'Join Discord',
+    Func = function()
+        setclipboard('https://discord.gg/xanDQj7X')
+        library:Notify("Copied invite link to clipboard")
+    end,
+    DoubleClick = false,
+    Tooltip = 'Copies discord link'
+})
 
 local FrameTimer = tick()
 local FrameCounter = 0;
@@ -1246,6 +1220,7 @@ end);
 
 menu_group:AddButton('Unload', function()
     enable_webhook = false
+    auto_bubble_up = false
     auto_gold_orb = false
     auto_playtime = false
     auto_collect = false
@@ -1260,7 +1235,6 @@ menu_group:AddButton('Unload', function()
     equip_best = false
     log_gifts = false
     auto_gift = false
-    goto_luck = false
     log_chats = false
     auto_blow = false
     auto_open = false
