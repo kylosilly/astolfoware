@@ -629,7 +629,7 @@ auto_hatch_group:AddToggle('auto_hatch', {
         function goto_egg()
             if Value and (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg" or selected_egg == "Throwback Egg") then
                 remote:FireServer("Teleport", "Workspace.Event.Portal.Spawn")
-                task.wait(.1)
+                task.wait(1)
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear), {CFrame = CFrame.new(workspace.Event.Model.Model["Meshes/Egg Circle_Circle.053"].Position)})
                 tween:Play()
                 tween.Completed:Wait()
@@ -640,7 +640,7 @@ auto_hatch_group:AddToggle('auto_hatch', {
                 tween.Completed:Wait()
             elseif Value and not (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg") then
                 remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
-                task.wait(.1)
+                task.wait(1)
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear), {CFrame = CFrame.new(workspace.Worlds["The Overworld"].Decoration.Eggs.EggPlatform["Meshes/bgseggarea12_Circle.019"].Position)})
                 tween:Play()
                 tween.Completed:Wait()
