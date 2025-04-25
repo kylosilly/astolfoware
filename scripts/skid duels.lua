@@ -34,7 +34,7 @@ if local_player.TeamColor == BrickColor.new("Bright red") then
         local distance = (blue_finish.Position - local_player.Character.HumanoidRootPart.Position).magnitude
         local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(blue_finish.Position)})
         tween:Play()
-        tween.Completed:Wait()         
+        tween.Completed:Wait()
         task.wait(5)
     end
 elseif local_player.TeamColor == BrickColor.new("Bright blue") then
