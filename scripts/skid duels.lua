@@ -26,7 +26,7 @@ if local_player.TeamColor == BrickColor.new("Bright red") then
         end)
         if local_player.PlayerGui.Hotbar.MainFrame.GameEndFrame.Visible then
             library:Notify("Game Ended, Teleporting To Next Match...")
-            velocity_connection:Disconnect()
+            connections:Disconnect()
             replicated_storage:WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("MatchService"):WaitForChild("RF"):WaitForChild("EnterQueue"):InvokeServer("Solo")
             return
         end
@@ -48,7 +48,7 @@ elseif local_player.TeamColor == BrickColor.new("Bright blue") then
         end)
         if local_player.PlayerGui.Hotbar.MainFrame.GameEndFrame.Visible then
             library:Notify("Game Ended, Teleporting To Next Match...")
-            velocity_connection:Disconnect()
+            connections:Disconnect()
             replicated_storage:WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("MatchService"):WaitForChild("RF"):WaitForChild("EnterQueue"):InvokeServer("Solo")
             return
         end
