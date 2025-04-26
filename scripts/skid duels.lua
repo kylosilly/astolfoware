@@ -7,13 +7,31 @@ end
 local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua'))()
 
 local replicated_storage = game:GetService('ReplicatedStorage')
-local local_player = game:GetService('Players').LocalPlayer
 local tween_service = game:GetService('TweenService')
 local run_service = game:GetService('RunService')
 local workspace = game:GetService('Workspace')
+local players = game:GetService('Players')
+local local_player = players.LocalPlayer
 local camera = workspace.CurrentCamera
 
-task.wait(5)
+function check_loaded(v)
+    if not v or v == local_player then return end
+    if not v:HasAppearanceLoaded() then
+        repeat task.wait(.25) print("Waiting For: "..v.Name) until v:HasAppearanceLoaded()
+    end
+end
+
+for _,v in next, players:GetPlayers() do
+    check_loaded(v)
+end
+
+players.PlayerAdded:Connect(function(v)
+    check_loaded(v)
+end)
+
+task.wait(6)
+
+replicated_storage:WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer("Auto Farm V1.0.0 Made By @kylosilly", "All")
 
 if local_player.TeamColor == BrickColor.new("Bright red") then
     library:Notify("Starting Auto Farm!")
@@ -25,6 +43,7 @@ if local_player.TeamColor == BrickColor.new("Bright red") then
             end
         end)
         if local_player.PlayerGui.Hotbar.MainFrame.GameEndFrame.Visible then
+            replicated_storage:WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer("gg :3", "All")
             library:Notify("Game Ended, Teleporting To Next Match...")
             connections:Disconnect()
             replicated_storage:WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("MatchService"):WaitForChild("RF"):WaitForChild("EnterQueue"):InvokeServer("Solo")
@@ -47,6 +66,7 @@ elseif local_player.TeamColor == BrickColor.new("Bright blue") then
             end
         end)
         if local_player.PlayerGui.Hotbar.MainFrame.GameEndFrame.Visible then
+            replicated_storage:WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer("gg :3", "All")
             library:Notify("Game Ended, Teleporting To Next Match...")
             connections:Disconnect()
             replicated_storage:WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("MatchService"):WaitForChild("RF"):WaitForChild("EnterQueue"):InvokeServer("Solo")
