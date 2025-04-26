@@ -18,7 +18,7 @@ local library = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BLibrary%5D'))()
 local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManager%5D'))()
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
-local version = "V2.3.0"
+local version = "V2.4.0"
 
 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Intro") then
     library:Notify("Start the game first before using the script!")
@@ -176,7 +176,8 @@ local roles = {
     ["x25"] = "",
     ["Man Egg"] = "",
     ["Royale Chest"] = "",
-    ["Easter Egg"] = ""
+    ["Easter Egg"] = "",
+    ["Silly Egg"] = ""
 }
 
 local potions = {
@@ -225,10 +226,16 @@ rifts.ChildAdded:Connect(function(egg)
             }
         }
 
+        if egg.Name == "silly-egg" and roles["Silly Egg"] ~= "" then
+            data["content"] = roles["Silly Egg"] .. " | Silly Egg Spawned!"
+        elseif egg.Name == "silly-egg" and roles ["Silly Egg"] == "" then
+            data["content"] = "@everyone | Silly Egg Spawned!"
+        end
+
         if egg.Name == "man-egg" and roles["Man Egg"] ~= "" then
-            data["content"] = roles["Man Egg"]
+            data["content"] = roles["Man Egg"] .. " | Man Egg Spawned!"
         elseif egg.Name == "man-egg" and roles ["Man Egg"] == "" then
-            data["content"] = "@everyone"
+            data["content"] = "@everyone | Man Egg Spawned!"
         end
 
         if egg.Name == "event-1" and roles["Easter Egg"] ~= "" then
@@ -1225,14 +1232,24 @@ webhook_group:AddInput('easter_egg_ping', {
     end
 })
 
-update_group:AddLabel('Version V2.3.0 Updates:')
-update_group:AddLabel('[+] Updated Webhook Eggs And Auto Hatch For Event Eggs', true)
-update_group:AddLabel('[+] Fixed the issue saying man egg spawned when pastel egg spawned', true)
-update_group:AddLabel('[+] Added Delay Option To Auto Gifts', true)
-update_group:AddLabel('[+] Added New Event Auto Claimer', true)
-update_group:AddLabel('[+] Fixed Small Issues', true)
-update_group:AddLabel('[-] Removed Auto Goto Lucky Eggs (Till Rewroten)', true)
-update_group:AddLabel('New Discord: https://discord.gg/xanDQj7X', true)
+webhook_group:AddInput('silly_egg_ping', {
+    Default = '',
+    Numeric = false,
+    Finished = true,
+
+    Text = 'Role To Ping If Silly Egg :',
+    Tooltip = 'You can leave this as blank if you want it to ping everyone',
+
+    Placeholder = '',
+
+    Callback = function(Value)
+        roles["Silly Egg"] = Value
+        library:Notify("Role ID set to: " .. Value)
+    end
+})
+
+update_group:AddLabel('Version V2.4.0 Updates:')
+update_group:AddLabel('[+] Updated Webhook', true)
 
 update_group:AddButton({
     Text = 'Join Discord',
