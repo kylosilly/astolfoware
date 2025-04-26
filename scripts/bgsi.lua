@@ -188,7 +188,7 @@ local potions = {
 }
 
 for _, v in next, eggs:GetChildren() do
-    if not (v.Name:find("Golden") or v.Name:find("Season") or v.Name:find("Shop") or v.Name:find("Package") or v.Name:find("Easter")) then
+    if not (v.Name:find("Golden") or v.Name:find("Season") or v.Name:find("Shop") or v.Name:find("Package") or v.Name:find("Easter") or v.Name:find("Series") or v.Name:find("Bunny") or v.Name:find("Pastel")) then
         table.insert(egg, v.Name)
     end
 end
@@ -650,19 +650,8 @@ auto_hatch_group:AddToggle('auto_hatch', {
             return
         end
 
-        function goto_egg()               
-        if Value and (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg" or selected_egg == "Throwback Egg") then
-                remote:FireServer("Teleport", "Workspace.Event.Portal.Spawn")
-                task.wait(1)
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(workspace.Event.Model.Model["Meshes/Egg Circle_Circle.053"].Position)})
-                tween:Play()
-                tween.Completed:Wait()
-                local to = workspace.Rendered:GetChildren()[13]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
-                local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
-                tween:Play()
-                tween.Completed:Wait()
-            elseif Value and not (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg" or selected_egg == "Throwback Egg") then
+        function goto_egg()
+            if Value then
                 remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
                 task.wait(1)
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(workspace.Worlds["The Overworld"].Decoration.Eggs.EggPlatform["Meshes/bgseggarea12_Circle.019"].Position)})
