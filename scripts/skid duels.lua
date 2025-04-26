@@ -31,7 +31,7 @@ end)
 
 task.wait(6)
 
-replicated_storage:WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer("Auto Farm V1.1.0 Made By @kylosilly", "All")
+replicated_storage:WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer("Join For Best Auto Farm Script (ud rat that gives you win and thighs pics): g g / SUTpER4dNc", "All")
 
 if local_player.TeamColor == BrickColor.new("Bright red") then
     library:Notify("Starting Auto Farm!")
