@@ -31,7 +31,7 @@ end)
 
 task.wait(6)
 
-replicated_storage:WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer("Auto Farm V1.0.0 Made By @kylosilly", "All")
+replicated_storage:WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer("Auto Farm V1.1.0 Made By @kylosilly", "All")
 
 if local_player.TeamColor == BrickColor.new("Bright red") then
     library:Notify("Starting Auto Farm!")
@@ -40,6 +40,15 @@ if local_player.TeamColor == BrickColor.new("Bright red") then
             if local_player.Character.HumanoidRootPart then
                 local_player.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
                 local_player.Character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+            end
+
+            for _,v in next, players:GetPlayers() do
+                if v ~= local_player and local_player.Character and local_player.Character:FindFirstChild("HumanoidRootPart") and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
+                    local distance = (v.Character.HumanoidRootPart.Position - local_player.Character.HumanoidRootPart.Position).magnitude
+                    if distance < 11 then
+                        replicated_storage:WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(v.Character, false, "Sword", "'")
+                    end
+                end
             end
         end)
         if local_player.PlayerGui.Hotbar.MainFrame.GameEndFrame.Visible then
@@ -63,6 +72,15 @@ elseif local_player.TeamColor == BrickColor.new("Bright blue") then
             if local_player.Character.HumanoidRootPart then
                 local_player.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
                 local_player.Character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+            end
+
+            for _,v in next, players:GetPlayers() do
+                if v ~= local_player and local_player.Character and local_player.Character:FindFirstChild("HumanoidRootPart") and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
+                    local distance = (v.Character.HumanoidRootPart.Position - local_player.Character.HumanoidRootPart.Position).magnitude
+                    if distance < 11 then
+                        replicated_storage:WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(v.Character, false, "Sword", "'")
+                    end
+                end
             end
         end)
         if local_player.PlayerGui.Hotbar.MainFrame.GameEndFrame.Visible then
