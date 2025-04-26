@@ -45,6 +45,9 @@ local farm_group = tabs.main:AddLeftGroupbox('Farm Settings')
 local misc_group = tabs.main:AddRightGroupbox('Misc Stuff')
 local auto_hatch_group = tabs.main:AddLeftGroupbox('Auto Hatch Settings')
 local teleport_group = tabs.main:AddRightGroupbox('Teleport Settings')
+--[[
+local auto_enchant_group = tabs.main:AddRightGroupbox('Auto Enchant Settings')
+]]
 local auto_group = tabs.auto:AddLeftGroupbox('Auto Settings')
 local auto_use_group = tabs.auto:AddRightGroupbox('Auto Use Settings')
 local webhook_group = tabs.webhook:AddLeftGroupbox('Webhook Settings')
@@ -70,10 +73,11 @@ local remote = require(replicated_storage.Shared.Framework.Network.Remote)
 local shiny_utility = require(replicated_storage.Shared.Utils.ShinyUtil)
 local pet_level = require(replicated_storage.Shared.Utils.PetLevelUtil)
 local stat = require(replicated_storage.Shared.Utils.Stats.StatsUtil)
+local pets = require(replicated_storage.Shared.Utils.Stats.PetUtil)
 local codes = require(replicated_storage.Shared.Data.Codes)
 
 local overworld_islands = workspace.Worlds["The Overworld"].Islands
-local pickables = workspace.Rendered:GetChildren()[14]
+local pickables = workspace.Rendered:GetChildren()[13]
 local eggs = replicated_storage.Assets.Eggs
 local chest = workspace.Rendered.Chests
 local gifts = workspace.Rendered.Gifts
@@ -104,10 +108,19 @@ local auto_sell = false
 local log_eggs = false
 local stop_at = false
 
+--[[
+local selected_enchant_method = ""
+]]
 local selected_gift = "Mystery Box"
 local collect_method = "Remote"
+--[[
+local selected_enchant = ""
+]]
 local selected_island = ""
 local selected_potion = ""
+--[[
+local selected_pet = ""
+]]
 local selected_egg = ""
 
 local selected_enchant_slot = 1
@@ -118,8 +131,9 @@ local collect_speed = 0.5
 local open_amount = 10
 
 local island_names = {}
-local pet_guids = {}
-local pet_slots = {}
+--[[
+local current_pets = {}
+]]
 local egg = {}
 
 local enchantments = {
@@ -140,7 +154,10 @@ local enchantments = {
     "🫧 Bubbler V",
     "✨ Gleaming I",
     "✨ Gleaming II",
-    "✨ Gleaming III"
+    "✨ Gleaming III",
+    "🎲 High Roller",
+    "∞ Infinity",
+    "🧲 Magnetism"
 }
 
 local shops = {
@@ -630,23 +647,23 @@ auto_hatch_group:AddToggle('auto_hatch', {
         if Value and (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg" or selected_egg == "Throwback Egg") then
                 remote:FireServer("Teleport", "Workspace.Event.Portal.Spawn")
                 task.wait(1)
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear), {CFrame = CFrame.new(workspace.Event.Model.Model["Meshes/Egg Circle_Circle.053"].Position)})
+                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(workspace.Event.Model.Model["Meshes/Egg Circle_Circle.053"].Position)})
                 tween:Play()
                 tween.Completed:Wait()
                 local to = workspace.Rendered:GetChildren()[13]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
                 local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
+                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
                 tween:Play()
                 tween.Completed:Wait()
-            elseif Value and not (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg") then
+            elseif Value and not (selected_egg == "Bunny Egg" or selected_egg == "Pastel Egg" or selected_egg == "Throwback Egg") then
                 remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
                 task.wait(1)
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear), {CFrame = CFrame.new(workspace.Worlds["The Overworld"].Decoration.Eggs.EggPlatform["Meshes/bgseggarea12_Circle.019"].Position)})
+                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(workspace.Worlds["The Overworld"].Decoration.Eggs.EggPlatform["Meshes/bgseggarea12_Circle.019"].Position)})
                 tween:Play()
                 tween.Completed:Wait()
-                local to = workspace.Rendered:GetChildren()[13]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
+                local to = workspace.Rendered:GetChildren()[12]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
                 local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
+                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
                 tween:Play()
                 tween.Completed:Wait()
             end
@@ -690,6 +707,34 @@ teleport_group:AddButton({
     DoubleClick = false,
     Tooltip = 'Teleports to selected island',
 })
+
+--[[
+auto_enchant_group:AddDropdown('enchant_selector', {
+    Values = enchantments,
+    Default = selected_enchant,
+    Multi = false,
+
+    Text = 'Select Enchant:',
+    Tooltip = 'Select a enchant to enchant your pet with',
+
+    Callback = function(Value)
+        selected_enchant = Value
+    end
+})
+
+auto_enchant_group:AddDropdown('auto_enchant_method', {
+    Values = { 'Reroll All', 'Reroll Slot' },
+    Default = "Reroll All",
+    Multi = false,
+
+    Text = 'Select Enchant Method:',
+    Tooltip = 'Select an enchant method to use',
+
+    Callback = function(Value)
+        selected_enchant_method = Value
+    end
+})
+]]
 
 auto_group:AddToggle('auto_doggy', {
     Text = 'Auto Doggy Minigame',
