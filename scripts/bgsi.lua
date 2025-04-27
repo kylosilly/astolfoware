@@ -18,7 +18,7 @@ local library = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BLibrary%5D'))()
 local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManager%5D'))()
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
-local version = "V2.4.0"
+local version = "V2.4.5"
 
 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Intro") then
     library:Notify("Start the game first before using the script!")
@@ -651,9 +651,17 @@ auto_hatch_group:AddToggle('auto_hatch', {
         end
 
         function goto_egg()
-            if Value then
+            if Value and selected_egg == "100M Egg" then
                 remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
-                task.wait(1)
+                task.wait(.25)
+                local to = workspace.Rendered:GetChildren()[12]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
+                local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
+                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
+                tween:Play()
+                tween.Completed:Wait()
+        elseif Value and not selected_egg == "100M Egg" then
+                remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
+                task.wait(.25)
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(workspace.Worlds["The Overworld"].Decoration.Eggs.EggPlatform["Meshes/bgseggarea12_Circle.019"].Position)})
                 tween:Play()
                 tween.Completed:Wait()
@@ -1205,6 +1213,7 @@ webhook_group:AddInput('royale_chest_ping', {
     end
 })
 
+--[[
 webhook_group:AddInput('easter_egg_ping', {
     Default = '',
     Numeric = false,
@@ -1220,6 +1229,7 @@ webhook_group:AddInput('easter_egg_ping', {
         library:Notify("Role ID set to: " .. Value)
     end
 })
+]]
 
 webhook_group:AddInput('silly_egg_ping', {
     Default = '',
@@ -1237,8 +1247,10 @@ webhook_group:AddInput('silly_egg_ping', {
     end
 })
 
-update_group:AddLabel('Version V2.4.0 Updates:')
+update_group:AddLabel('Version V2.4.5 Updates:')
 update_group:AddLabel('[+] Updated Webhook', true)
+update_group:AddLabel('[+] Updated Auto Egg Hatch', true)
+
 
 update_group:AddButton({
     Text = 'Join Discord',
