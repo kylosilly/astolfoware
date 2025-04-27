@@ -253,7 +253,7 @@ rifts.ChildAdded:Connect(function(egg)
         if egg.Name == "event-3" and roles["Easter Egg"] ~= "" then
             data["content"] = roles["Easter Egg"] .. " | Throwback Egg Spawned!"
         elseif egg.Name == "event-3" and roles["Easter Egg"] == "" then
-            data["content"] = "@everyone | Man Egg Spawned!"
+            data["content"] = "@everyone | Throwback Egg Spawned!"
         end
 
         if egg.Display.SurfaceGui.Icon.Luck.Text == "x25" and roles["x25"] ~= "" then
@@ -1213,7 +1213,6 @@ webhook_group:AddInput('royale_chest_ping', {
     end
 })
 
---[[
 webhook_group:AddInput('easter_egg_ping', {
     Default = '',
     Numeric = false,
@@ -1229,7 +1228,6 @@ webhook_group:AddInput('easter_egg_ping', {
         library:Notify("Role ID set to: " .. Value)
     end
 })
-]]
 
 webhook_group:AddInput('silly_egg_ping', {
     Default = '',
