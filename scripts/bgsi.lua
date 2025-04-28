@@ -653,34 +653,34 @@ auto_hatch_group:AddToggle('auto_hatch', {
         function goto_egg()
             if Value and selected_egg == "100M Egg" then
                 remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
-                task.wait(.25)
+                task.wait(0.25)
                 local to = workspace.Rendered:GetChildren()[12]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
                 local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
+                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
                 tween:Play()
                 tween.Completed:Wait()
-        elseif Value and not selected_egg == "100M Egg" then
+                return
+            elseif Value and selected_egg ~= "100M Egg" then
                 remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
-                task.wait(.25)
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(workspace.Worlds["The Overworld"].Decoration.Eggs.EggPlatform["Meshes/bgseggarea12_Circle.019"].Position)})
+                task.wait(0.25)
+                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(workspace.Rendered.Generic["Infinity Egg"].Hitbox.Position)})
                 tween:Play()
                 tween.Completed:Wait()
+        
                 local to = workspace.Rendered:GetChildren()[12]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
                 local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
-                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
+                local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
                 tween:Play()
                 tween.Completed:Wait()
             end
-        end
+        end        
 
         goto_egg()
 
-        while task.wait() do
-            if auto_hatch then
-                remote:FireServer("HatchEgg", selected_egg, stat:GetMaxEggHatches(data))
-                task.wait(stat:GetHatchSpeed(data) / 2)
-            end
-        end
+        repeat
+            remote:FireServer("HatchEgg", selected_egg, stat:GetMaxEggHatches(data))
+            task.wait(stat:GetHatchSpeed(data) / 2)
+        until not auto_hatch
     end
 })
 
