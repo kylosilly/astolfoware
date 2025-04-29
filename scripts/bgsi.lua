@@ -18,7 +18,7 @@ local library = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BLibrary%5D'))()
 local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManager%5D'))()
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
-local version = "V2.4.5"
+local version = "V2.5.0"
 
 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Intro") then
     library:Notify("Start the game first before using the script!")
@@ -37,7 +37,6 @@ local tabs = {
     main = window:AddTab('Main'),
     auto = window:AddTab('Auto'),
     webhook = window:AddTab('Webhook'),
-    update = window:AddTab('Updates'),
     ['ui settings'] = window:AddTab('UI Settings')
 }
 
@@ -51,7 +50,6 @@ local auto_enchant_group = tabs.main:AddRightGroupbox('Auto Enchant Settings')
 local auto_group = tabs.auto:AddLeftGroupbox('Auto Settings')
 local auto_use_group = tabs.auto:AddRightGroupbox('Auto Use Settings')
 local webhook_group = tabs.webhook:AddLeftGroupbox('Webhook Settings')
-local update_group = tabs.update:AddLeftGroupbox('Update Settings')
 local menu_group = tabs['ui settings']:AddLeftGroupbox('Menu')
 
 local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
@@ -679,7 +677,7 @@ auto_hatch_group:AddToggle('auto_hatch', {
 
         repeat
             remote:FireServer("HatchEgg", selected_egg, stat:GetMaxEggHatches(data))
-            task.wait(stat:GetHatchSpeed(data) / 2)
+            task.wait(stat:GetHatchSpeed(data) / 3)
         until not auto_hatch
     end
 })
@@ -1243,21 +1241,6 @@ webhook_group:AddInput('silly_egg_ping', {
         roles["Silly Egg"] = Value
         library:Notify("Role ID set to: " .. Value)
     end
-})
-
-update_group:AddLabel('Version V2.4.5 Updates:')
-update_group:AddLabel('[+] Updated Webhook', true)
-update_group:AddLabel('[+] Updated Auto Egg Hatch', true)
-
-
-update_group:AddButton({
-    Text = 'Join Discord',
-    Func = function()
-        setclipboard('https://discord.gg/xanDQj7X')
-        library:Notify("Copied invite link to clipboard")
-    end,
-    DoubleClick = false,
-    Tooltip = 'Copies discord link'
 })
 
 local FrameTimer = tick()
