@@ -53,11 +53,15 @@ local game_state = require(replicated_storage.Modules.GameState)
 local teleports = require(replicated_storage.Modules.Teleport)
 local tables = require(replicated_storage.Modules.Table)
 
+local slot1 = local_player.PlayerGui.ScreenGui.Enchant.Content.Slots["1"].EnchantName
+local slot2 = local_player.PlayerGui.ScreenGui.Enchant.Content.Slots["2"].EnchantName
+
 local auto_enchant = false
 local auto_mine = false
 
 local selected_enchantment = ""
 local selected_pickaxe = ""
+local enchant_pickaxe = ""
 local selected_ore = ""
 
 local selected_amount = 1
@@ -209,7 +213,7 @@ game_group:AddButton({
 })
 
 misc_group:AddButton({
-    Text = 'Sell All',
+    Text = 'Sell All [Testing]',
     Func = function()
         for i, v in next, game_state:GetData().Inventory do
             if not (v.Name:find("Pickaxe") or v.Name:find("Pick") or v.Name:find("Chopper") or v.Name:find("Sharkee") or v.Name:find("Demonaxe")) then
@@ -297,9 +301,8 @@ shop_group:AddButton({
     Tooltip = 'Buys selected pickaxe'
 })
 
-enchant_group:AddLabel("Releasing Next Update <3", true)
+enchant_group:AddLabel("Go in enchant gui and select the selected pickaxe before using!", true)
 
---[[
 enchant_group:AddDropdown('enchant_selector', {
     Values = enchantments,
     Default = selected_enchantment,
@@ -314,15 +317,15 @@ enchant_group:AddDropdown('enchant_selector', {
 })
 
 enchant_group:AddDropdown('pickaxe_selector', {
-    Values = get_inventory(),
-    Default = selected_pickaxe,
+    Values = pickaxes,
+    Default = enchant_pickaxe,
     Multi = false,
 
     Text = 'Select A Pickaxe:',
     Tooltip = 'Select a pickaxe to enchant', 
 
     Callback = function(Value)
-        selected_pickaxe = Value
+        enchant_pickaxe = Value
     end
 })
 
@@ -338,7 +341,51 @@ enchant_group:AddDropdown('slot_selector', {
         selected_slot = Value
     end
 })
-]]
+
+enchant_group:AddToggle('auto_enchant', {
+    Text = 'Auto Enchant',
+    Default = auto_enchant,
+    Tooltip = 'Auto Enchants Pickaxe',
+
+    Callback = function(Value)
+        auto_enchant = Value
+        if Value then
+            if enchant_pickaxe == "" then
+                client_utlility:AddNotification("You need to select a pickaxe to enchant first", Color3.fromRGB(255, 105, 180), 1)
+                return
+            end
+
+            if not local_player.PlayerGui.ScreenGui.Enchant.Visible then
+                client_utlility:AddNotification("Open enchant UI and select pickaxe first!", Color3.fromRGB(255, 105, 180), 1)
+                return
+            end
+
+            local index = i
+            for i, v in next, game_state:GetData().Inventory do
+                if v.Name == enchant_pickaxe then
+                    index = i
+                    break
+                end
+            end
+
+            if not index then
+                client_utlility:AddNotification("Pickaxe not found", Color3.fromRGB(255, 105, 180), 1)
+                return
+            end
+            
+            repeat
+                if selected_slot == 1 and slot1.Text == selected_enchantment then
+                    return
+                elseif selected_slot == 2 and slot2.Text == selected_enchantment then
+                    return
+                end
+
+                replicated_storage:WaitForChild("Remotes"):WaitForChild("Enchant"):FireServer(index, selected_slot)
+                task.wait(.1)
+            until (selected_slot == 1 and slot1.Text == selected_enchantment) or (selected_slot == 2 and slot2.Text == selected_enchantment) or not auto_enchant or not local_player.PlayerGui.ScreenGui.Enchant.Visible
+        end
+    end
+})
 
 local FrameTimer = tick()
 local FrameCounter = 0;
