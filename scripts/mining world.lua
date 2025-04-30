@@ -1,4 +1,3 @@
---// Ignore the not done stuff :sob:
 if not game:IsLoaded() then
     print("Waiting for game to load...")
     game.Loaded:Wait()
@@ -18,7 +17,7 @@ local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManag
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
 local window = library:CreateWindow({
-    Title = 'Astolfo Ware | Public | Made By @kylosilly',
+    Title = 'Astolfo Ware | Made By @kylosilly',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -28,6 +27,7 @@ local window = library:CreateWindow({
 local tabs = {
     main = window:AddTab('Main'),
     auto = window:AddTab('Auto'),
+    misc = window:AddTab('Misc'),
     ['ui settings'] = window:AddTab('UI Settings')
 }
 
@@ -36,9 +36,12 @@ local misc_group = tabs.main:AddRightGroupbox('Misc Settings')
 local farm_group = tabs.auto:AddLeftGroupbox('Auto Farm Settings')
 local shop_group = tabs.auto:AddRightGroupbox('Shop Stuff')
 local enchant_group = tabs.auto:AddRightGroupbox('Auto Enchant Settings')
+local teleport_group = tabs.misc:AddLeftGroupbox('Teleport Settings')
+local player_group = tabs.misc:AddRightGroupbox('Player Settings')
 local menu_group = tabs['ui settings']:AddLeftGroupbox('Menu')
 
 local replicated_storage = cloneref(game:GetService("ReplicatedStorage"))
+local user_input_service = cloneref(game:GetService("UserInputService"))
 local teleport_service = cloneref(game:GetService("TeleportService"))
 local market = cloneref(game:GetService("MarketplaceService"))
 local virtual_user = cloneref(game:GetService('VirtualUser'))
@@ -49,6 +52,7 @@ local stats = cloneref(game:GetService("Stats"))
 local info = market:GetProductInfo(game.PlaceId)
 local getgc = getconnections or get_signal_cons
 local local_player = players.LocalPlayer
+local camera = workspace.CurrentCamera
 
 local player_functions = require(replicated_storage.Modules.PlayerFunctions)
 local client_utlility = require(replicated_storage.Modules.ClientUtility)
@@ -59,13 +63,18 @@ local tables = require(replicated_storage.Modules.Table)
 local slot1 = local_player.PlayerGui.ScreenGui.Enchant.Content.Slots["1"].EnchantName
 local slot2 = local_player.PlayerGui.ScreenGui.Enchant.Content.Slots["2"].EnchantName
 
+local custom_message = false
 local auto_enchant = false
+local show_health = false
 local auto_mine = false
 local auto_sell = false
+local inf_jump = false
+local delay = false
 
 local selected_enchantment = ""
 local selected_pickaxe = ""
 local enchant_pickaxe = ""
+local selected_npc = ""
 local selected_ore = ""
 
 local selected_amount = 1
@@ -88,10 +97,12 @@ local enchantments = {
 
 local node_name = {}
 local pickaxes = {}
+local npcs = {}
 
 local node_names = replicated_storage:FindFirstChild("Nodes")
 local items = replicated_storage:FindFirstChild("Items")
 local nodes = workspace:FindFirstChild("Nodes")
+local npc = workspace:FindFirstChild("NPCs")
 
 local selected_level = "Level 1"
 
@@ -105,17 +116,9 @@ for _, v in next, items:GetChildren() do
     end
 end
 
---[[
-function get_inventory()
-    local inventory_pickaxes = {}
-    for _, v in next, game_state:GetData().Inventory do
-        if v.Name:find("Pickaxe") or v.Name:find("Pick") or v.Name:find("Chopper") or v.Name:find("Sharkee") or v.Name:find("Demonaxe") then
-            table.insert(inventory_pickaxes, v.Name)
-        end
-    end
-    return inventory_pickaxes
+for _, v in next, npc:GetChildren() do
+    table.insert(npcs, v.Name)
 end
-]]
 
 function closest_ore()
     local ore = nil;
@@ -126,13 +129,22 @@ function closest_ore()
             local distance = (local_player.Character:GetPivot().Position - v:GetPivot().Position).magnitude
             if distance < max_distance then
                 max_distance = distance
-                ore = v.Name
+                ore = v
             end
         end
     end
 
     return ore
 end
+
+user_input_service.JumpRequest:Connect(function()
+    if inf_jump and not delay then
+        delay = true
+        local_player.Character:FindFirstChild("Humanoid"):ChangeState("Jumping")
+        wait()
+        delay = false
+    end
+end)
 
 game_group:AddButton({
     Text = "Unlock Level 2",
@@ -297,6 +309,10 @@ misc_group:AddButton({
 misc_group:AddButton({
     Text = 'Rejoin',
     Func = function()
+        queue_on_teleport([[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/astolfo%20ware%20loader.lua"))()
+        ]])
+
         teleport_service:TeleportToPlaceInstance(game.PlaceId, game.JobId, local_player)
     end,
     DoubleClick = false,
@@ -331,10 +347,30 @@ farm_group:AddToggle('auto_mine', {
             repeat
                 local ore = closest_ore()
                 if ore and game_state:GetData():PickaxeIsEquipped() then
-                    replicated_storage:WaitForChild("Remotes"):WaitForChild("DamageNode"):FireServer(ore)
+                    replicated_storage:WaitForChild("Remotes"):WaitForChild("DamageNode"):FireServer(ore.Name)
+                end
+                if show_health and ore:FindFirstChild("Info") then
+                    ore.Info.Enabled = true
                 end
                 task.wait(player_functions:GetPickaxeSpeed(game_state:GetData()))
             until not auto_mine
+        end
+    end
+})
+
+farm_group:AddToggle('show_health', {
+    Text = 'Show Ore Health',
+    Default = show_health,
+    Tooltip = 'Enabled the info billboard',
+
+    Callback = function(Value)
+        show_health = Value
+        if not Value then
+            for _, v in next, nodes:GetChildren() do
+                if v:IsA("Model") and v:FindFirstChild("Info") then
+                    v.Info.Enabled = false
+                end
+            end
         end
     end
 })
@@ -465,6 +501,61 @@ enchant_group:AddToggle('auto_enchant', {
     end
 })
 
+teleport_group:AddDropdown('npc_selector', {
+    Values = npcs,
+    Default = selected_npc,
+    Multi = false,
+
+    Text = 'Select Npc To Teleport To:',
+    Tooltip = 'Teleports you to selected npc',
+
+    Callback = function(Value)
+        selected_npc = Value
+    end
+})
+
+teleport_group:AddButton({
+    Text = 'Teleport To Npc',
+    Func = function()
+        if selected_npc == "" then
+            client_utlility:AddNotification("You need to select a npc to teleport to first", Color3.fromRGB(255, 105, 180), 1)
+            return
+        end
+        for _, v in next, npc:GetChildren() do
+            if v.Name == selected_npc then
+                local_player.Character.PrimaryPart.CFrame = v.PrimaryPart.CFrame + v.PrimaryPart.CFrame.LookVector * 5
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Teleports to selected npc'
+})
+
+player_group:AddSlider('fov_Changer', {
+    Text = 'FOV Changer',
+    Default = camera.FieldOfView,
+    Min = 1,
+    Max = 120,
+    Rounding = 0,
+    Compact = false,
+
+    Callback = function(Value)
+        camera.FieldOfView = Value
+    end
+})
+
+player_group:AddDivider()
+
+player_group:AddToggle('inf_jump', {
+    Text = 'Inf Jump',
+    Default = inf_jump,
+    Tooltip = 'Lets you jump forever',
+
+    Callback = function(Value)
+        inf_jump = Value
+    end
+})
+
 local FrameTimer = tick()
 local FrameCounter = 0;
 local FPS = 60;
@@ -485,9 +576,18 @@ local watermark_connection = run_service.RenderStepped:Connect(function()
 end);
 
 menu_group:AddButton('Unload', function()
+    custom_message = false
     auto_enchant = false
+    show_health = false
     auto_mine = false
     auto_sell = false
+    inf_jump = false
+    camera.FieldOfView = 70
+    for _, v in next, nodes:GetChildren() do
+        if v:IsA("Model") and v:FindFirstChild("Info") then
+            v.Info.Enabled = false
+        end
+    end
     watermark_connection:Disconnect()
     library:Unload()
 end)
