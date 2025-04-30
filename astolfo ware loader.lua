@@ -32,6 +32,9 @@ elseif place_id == 14056802186 then
 elseif place_id == 85896571713843 then
     loadstring(game:HttpGet(scripts.."bgsi.lua"))()
     lib:Notify('Supported game loading: ' .. info.Name)
+elseif place_id == 81319028163805 then
+    loadstring(game:HttpGet(scripts.."mining%20world.lua"))()
+    lib:Notify('Supported game loading: ' .. info.Name)
 else
     lib:Notify('Game not supported: ' .. info.Name .. ' if you wanna support this game join the discord copied to your clipboard')
     setclipboard("https://discord.gg/U5yjDvsxHR")
