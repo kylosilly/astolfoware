@@ -39,12 +39,15 @@ local enchant_group = tabs.auto:AddRightGroupbox('Auto Enchant Settings')
 local menu_group = tabs['ui settings']:AddLeftGroupbox('Menu')
 
 local replicated_storage = cloneref(game:GetService("ReplicatedStorage"))
+local teleport_service = cloneref(game:GetService("TeleportService"))
 local market = cloneref(game:GetService("MarketplaceService"))
+local virtual_user = cloneref(game:GetService('VirtualUser'))
 local run_service = cloneref(game:GetService("RunService"))
 local workspace = cloneref(game:GetService("Workspace"))
 local players = cloneref(game:GetService("Players"))
 local stats = cloneref(game:GetService("Stats"))
 local info = market:GetProductInfo(game.PlaceId)
+local getgc = getconnections or get_signal_cons
 local local_player = players.LocalPlayer
 
 local player_functions = require(replicated_storage.Modules.PlayerFunctions)
@@ -58,6 +61,7 @@ local slot2 = local_player.PlayerGui.ScreenGui.Enchant.Content.Slots["2"].Enchan
 
 local auto_enchant = false
 local auto_mine = false
+local auto_sell = false
 
 local selected_enchantment = ""
 local selected_pickaxe = ""
@@ -66,6 +70,7 @@ local selected_ore = ""
 
 local selected_amount = 1
 local selected_slot = 1
+local sell_delay = 1
 
 local enchantments = {
     "Abnormal Speed",
@@ -154,8 +159,12 @@ game_group:AddButton({
         end
         for i = 1,3 do
             replicated_storage:WaitForChild("Remotes"):WaitForChild("BuyTool"):FireServer("Dynamite")
+        end
+        task.wait(.1)
+        for i = 1,3 do
             replicated_storage:WaitForChild("Remotes"):WaitForChild("PlaceDynamite"):FireServer(i)
         end
+        task.wait(.1)
         replicated_storage:WaitForChild("Remotes"):WaitForChild("DetonateDynamite"):FireServer()
     end,
     DoubleClick = false,
@@ -225,6 +234,75 @@ misc_group:AddButton({
     Tooltip = 'Sells every ore in your inventory'
 })
 
+misc_group:AddDivider()
+
+misc_group:AddToggle('auto_sell', {
+    Text = 'Auto Sell',
+    Default = auto_sell,
+    Tooltip = 'Automatically sells everything for you',
+
+    Callback = function(Value)
+        auto_sell = Value
+        if Value then
+            repeat
+                for i, v in next, game_state:GetData().Inventory do
+                    if not (v.Name:find("Pickaxe") or v.Name:find("Pick") or v.Name:find("Chopper") or v.Name:find("Sharkee") or v.Name:find("Demonaxe")) then
+                        replicated_storage:WaitForChild("Remotes"):WaitForChild("SellItem"):FireServer(i, v.Amount)
+                    end
+                end
+                task.wait(sell_delay)
+            until not auto_sell
+        end
+    end
+})
+
+misc_group:AddSlider('auto_sell_delay', {
+    Text = 'Auto Sell Delay (Seconds)',
+    Default = sell_delay,
+    Min = 0,
+    Max = 60,
+    Rounding = 1,
+    Compact = false,
+
+    Callback = function(Value)
+        sell_delay = Value
+    end
+})
+
+misc_group:AddDivider()
+
+misc_group:AddButton({
+    Text = 'Anti Afk',
+    Func = function()
+        if getgc then
+            for _, v in next, getgc(local_player.Idled) do
+                if v["Disable"] then
+                    v["Disable"](v)
+                elseif v["Disconnect"] then
+                    v["Disconnect"](v)
+                end
+            end
+        else
+            local_player.Idled:Connect(function()
+                virtual_user:CaptureController()
+                virtual_user:ClickButton2(Vector2.new())
+            end)
+        end
+        client_utlility:AddNotification("Anti Afk Enabled", Color3.fromRGB(255, 105, 180), 1)
+    end,
+    DoubleClick = false,
+    Tooltip = 'Credits to inf yield <3',
+})
+
+misc_group:AddButton({
+    Text = 'Rejoin',
+    Func = function()
+        teleport_service:TeleportToPlaceInstance(game.PlaceId, game.JobId, local_player)
+    end,
+    DoubleClick = false,
+    Tooltip = 'Rejoins the game'
+})
+
 farm_group:AddDropdown('ore_selector', {
     Values = node_name,
     Default = selected_ore,
@@ -252,7 +330,7 @@ farm_group:AddToggle('auto_mine', {
             end
             repeat
                 local ore = closest_ore()
-                if ore then
+                if ore and game_state:GetData():PickaxeIsEquipped() then
                     replicated_storage:WaitForChild("Remotes"):WaitForChild("DamageNode"):FireServer(ore)
                 end
                 task.wait(player_functions:GetPickaxeSpeed(game_state:GetData()))
@@ -409,6 +487,7 @@ end);
 menu_group:AddButton('Unload', function()
     auto_enchant = false
     auto_mine = false
+    auto_sell = false
     watermark_connection:Disconnect()
     library:Unload()
 end)
