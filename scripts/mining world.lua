@@ -69,6 +69,7 @@ local show_health = false
 local auto_mine = false
 local auto_sell = false
 local inf_jump = false
+local view_ore = false
 local delay = false
 
 local selected_enchantment = ""
@@ -239,6 +240,7 @@ misc_group:AddButton({
         for i, v in next, game_state:GetData().Inventory do
             if not (v.Name:find("Pickaxe") or v.Name:find("Pick") or v.Name:find("Chopper") or v.Name:find("Sharkee") or v.Name:find("Demonaxe")) then
                 replicated_storage:WaitForChild("Remotes"):WaitForChild("SellItem"):FireServer(i, v.Amount)
+                task.wait()
             end
         end
     end,
@@ -260,6 +262,7 @@ misc_group:AddToggle('auto_sell', {
                 for i, v in next, game_state:GetData().Inventory do
                     if not (v.Name:find("Pickaxe") or v.Name:find("Pick") or v.Name:find("Chopper") or v.Name:find("Sharkee") or v.Name:find("Demonaxe")) then
                         replicated_storage:WaitForChild("Remotes"):WaitForChild("SellItem"):FireServer(i, v.Amount)
+                        task.wait()
                     end
                 end
                 task.wait(sell_delay)
@@ -352,6 +355,10 @@ farm_group:AddToggle('auto_mine', {
                 if show_health and ore:FindFirstChild("Info") then
                     ore.Info.Enabled = true
                 end
+                if view_ore then
+                    camera.CameraType = "Custom"
+                    camera.CameraSubject = ore.PrimaryPart
+                end
                 task.wait(player_functions:GetPickaxeSpeed(game_state:GetData()))
             until not auto_mine
         end
@@ -373,6 +380,37 @@ farm_group:AddToggle('show_health', {
             end
         end
     end
+})
+
+farm_group:AddToggle('view_ore', {
+    Text = 'View Closest Ore',
+    Default = view_ore,
+    Tooltip = 'Views closest ore',
+
+    Callback = function(Value)
+        view_ore = Value
+        if not Value then
+            camera.CameraSubject = local_player.Character.Humanoid
+        end
+    end
+})
+
+farm_group:AddDivider()
+
+farm_group:AddButton({
+    Text = 'Goto Safe Spot',
+    Func = function()
+        if not workspace:FindFirstChild("Safe") then
+            local part = Instance.new("Part", workspace)
+            part.Size = Vector3.new(50, 2, 50)
+            part.CFrame = CFrame.new(9999, 9999, 9999)
+            part.Anchored = true
+            part.Name = "Safe"
+        end
+        local_player.Character.PrimaryPart.CFrame = workspace.Safe.CFrame + Vector3.new(0, 5, 0)
+    end,
+    DoubleClick = false,
+    Tooltip = 'Teleports you somewhere where nobody can see you'
 })
 
 shop_group:AddDropdown('pickaxe_selector', {
@@ -544,6 +582,19 @@ player_group:AddSlider('fov_Changer', {
     end
 })
 
+player_group:AddSlider('walkspeed_Changer', {
+    Text = 'Walkspeed Changer',
+    Default = local_player.Character.Humanoid.WalkSpeed,
+    Min = 16,
+    Max = 100,
+    Rounding = 0,
+    Compact = false,
+
+    Callback = function(Value)
+        local_player.Character.Humanoid.WalkSpeed = Value
+    end
+})
+
 player_group:AddDivider()
 
 player_group:AddToggle('inf_jump', {
@@ -581,12 +632,18 @@ menu_group:AddButton('Unload', function()
     show_health = false
     auto_mine = false
     auto_sell = false
+    view_ore = false
     inf_jump = false
     camera.FieldOfView = 70
+    local_player.Character.Humanoid.WalkSpeed = 16
+    camera.CameraSubject = local_player.Character.Humanoid
     for _, v in next, nodes:GetChildren() do
         if v:IsA("Model") and v:FindFirstChild("Info") then
             v.Info.Enabled = false
         end
+    end
+    if workspace:FindFirstChild("Safe") then
+        workspace.Safe:Destroy()
     end
     watermark_connection:Disconnect()
     library:Unload()
