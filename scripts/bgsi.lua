@@ -84,7 +84,6 @@ local rifts = workspace.Rendered.Rifts
 local data = local_data:Get()
 
 local enable_webhook = false
-local auto_bubble_up = false
 local auto_gold_orb = false
 local auto_playtime = false
 local auto_collect = false
@@ -840,21 +839,6 @@ auto_group:AddToggle('auto_claim_seasonal', {
     end
 })
 
-auto_group:AddToggle('auto_claim_bubble_up', {
-    Text = 'Auto Claim Bubble Up',
-    Default = false,
-    Tooltip = 'Auto Claims Bubble Up',
-    Callback = function(Value)
-        auto_bubble_up = Value
-        while task.wait() do
-            if auto_bubble_up then
-                remote:FireServer("ChallengePassClaimReward")
-            end
-            task.wait(5)
-        end
-    end
-})
-
 auto_use_group:AddDropdown('potion_dropdown', {
     Values = potions,
     Default = "",
@@ -1264,7 +1248,6 @@ end);
 
 menu_group:AddButton('Unload', function()
     enable_webhook = false
-    auto_bubble_up = false
     auto_gold_orb = false
     auto_playtime = false
     auto_collect = false
