@@ -352,10 +352,10 @@ farm_group:AddToggle('auto_mine', {
                 if ore and game_state:GetData():PickaxeIsEquipped() then
                     replicated_storage:WaitForChild("Remotes"):WaitForChild("DamageNode"):FireServer(ore.Name)
                 end
-                if show_health and ore:FindFirstChild("Info") then
+                if ore and show_health and ore:FindFirstChild("Info") then
                     ore.Info.Enabled = true
                 end
-                if view_ore then
+                if ore and view_ore then
                     camera.CameraType = "Custom"
                     camera.CameraSubject = ore.PrimaryPart
                 end
