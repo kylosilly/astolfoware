@@ -18,7 +18,7 @@ local library = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BLibrary%5D'))()
 local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManager%5D'))()
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
-local version = "V2.5.0"
+local version = "V2.5.5"
 
 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Intro") then
     library:Notify("Start the game first before using the script!")
@@ -75,7 +75,7 @@ local pets = require(replicated_storage.Shared.Utils.Stats.PetUtil)
 local codes = require(replicated_storage.Shared.Data.Codes)
 
 local overworld_islands = workspace.Worlds["The Overworld"].Islands
-local pickables = workspace.Rendered:GetChildren()[13]
+local pickables = workspace.Rendered:GetChildren()[12]
 local eggs = replicated_storage.Assets.Eggs
 local chest = workspace.Rendered.Chests
 local gifts = workspace.Rendered.Gifts
@@ -173,7 +173,6 @@ local roles = {
     ["x25"] = "",
     ["Man Egg"] = "",
     ["Royale Chest"] = "",
-    ["Easter Egg"] = "",
     ["Silly Egg"] = ""
 }
 
@@ -181,11 +180,12 @@ local potions = {
     "Speed",
     "Lucky",
     "Coins",
-    "Mythic"
+    "Mythic",
+    "Infinity Elixir"
 }
 
 for _, v in next, eggs:GetChildren() do
-    if not (v.Name:find("Golden") or v.Name:find("Season") or v.Name:find("Shop") or v.Name:find("Package") or v.Name:find("Easter") or v.Name:find("Series") or v.Name:find("Bunny") or v.Name:find("Pastel")) then
+    if not (v.Name:find("Golden") or v.Name:find("Season") or v.Name:find("Shop") or v.Name:find("Package") or v.Name:find("Easter") or v.Name:find("Series") or v.Name:find("Bunny") or v.Name:find("Pastel") or v.Name:find("Throwback")) then
         table.insert(egg, v.Name)
     end
 end
@@ -233,24 +233,6 @@ rifts.ChildAdded:Connect(function(egg)
             data["content"] = roles["Man Egg"] .. " | Man Egg Spawned!"
         elseif egg.Name == "man-egg" and roles ["Man Egg"] == "" then
             data["content"] = "@everyone | Man Egg Spawned!"
-        end
-
-        if egg.Name == "event-1" and roles["Easter Egg"] ~= "" then
-            data["content"] = roles["Easter Egg"] .. " | Bunny Egg Spawned!"
-        elseif egg.Name == "event-1" and roles["Easter Egg"] == "" then
-            data["content"] = "@everyone | Bunny Egg Spawned!"
-        end
-
-        if egg.Name == "event-2" and roles["Easter Egg"] ~= "" then
-            data["content"] = roles["Easter Egg"] .. " | Pastel Egg Spawned!"
-        elseif egg.Name == "event-2" and roles["Easter Egg"] == "" then
-            data["content"] = "@everyone | Pastel Egg Spawned!"
-        end
-
-        if egg.Name == "event-3" and roles["Easter Egg"] ~= "" then
-            data["content"] = roles["Easter Egg"] .. " | Throwback Egg Spawned!"
-        elseif egg.Name == "event-3" and roles["Easter Egg"] == "" then
-            data["content"] = "@everyone | Throwback Egg Spawned!"
         end
 
         if egg.Display.SurfaceGui.Icon.Luck.Text == "x25" and roles["x25"] ~= "" then
@@ -650,8 +632,8 @@ auto_hatch_group:AddToggle('auto_hatch', {
         function goto_egg()
             if Value and selected_egg == "100M Egg" then
                 remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
-                task.wait(0.25)
-                local to = workspace.Rendered:GetChildren()[12]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
+                task.wait(0.5)
+                local to = workspace.Rendered:GetChildren()[11]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
                 local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
                 tween:Play()
@@ -659,12 +641,12 @@ auto_hatch_group:AddToggle('auto_hatch', {
                 return
             elseif Value and selected_egg ~= "100M Egg" then
                 remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
-                task.wait(0.25)
+                task.wait(0.5)
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(workspace.Rendered.Generic["Infinity Egg"].Hitbox.Position)})
                 tween:Play()
                 tween.Completed:Wait()
         
-                local to = workspace.Rendered:GetChildren()[12]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
+                local to = workspace.Rendered:GetChildren()[11]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
                 local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
                 tween:Play()
@@ -1191,22 +1173,6 @@ webhook_group:AddInput('royale_chest_ping', {
 
     Callback = function(Value)
         roles["royale"] = Value
-        library:Notify("Role ID set to: " .. Value)
-    end
-})
-
-webhook_group:AddInput('easter_egg_ping', {
-    Default = '',
-    Numeric = false,
-    Finished = true,
-
-    Text = 'Role To Ping If Easter Egg :',
-    Tooltip = 'You can leave this as blank if you want it to ping everyone',
-
-    Placeholder = '',
-
-    Callback = function(Value)
-        roles["Easter Egg"] = Value
         library:Notify("Role ID set to: " .. Value)
     end
 })
