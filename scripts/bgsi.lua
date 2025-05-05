@@ -1,5 +1,3 @@
---// if your pro code skid heres my dupe: https://github.com/kylosilly/astolfoware/blob/main/scripts/bgsidupe.lua
-
 if not game:IsLoaded() then
     print("Waiting for game to load...")
     game.Loaded:Wait()
@@ -18,15 +16,13 @@ local library = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BLibrary%5D'))()
 local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManager%5D'))()
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
-local version = "V2.5.5"
-
 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Intro") then
     library:Notify("Start the game first before using the script!")
     return
 end
 
 local window = library:CreateWindow({
-    Title = 'Astolfo Ware | Public | Made By @kylosilly | Version: ' .. version,
+    Title = 'Astolfo Ware | Public | Made By @kylosilly',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -74,12 +70,31 @@ local stat = require(replicated_storage.Shared.Utils.Stats.StatsUtil)
 local pets = require(replicated_storage.Shared.Utils.Stats.PetUtil)
 local codes = require(replicated_storage.Shared.Data.Codes)
 
+local minigame_paradise_islands = workspace.Worlds["Minigame Paradise"].Islands
 local overworld_islands = workspace.Worlds["The Overworld"].Islands
-local pickables = workspace.Rendered:GetChildren()[12]
+local dices = replicated_storage.Assets.Minigames.Dice
 local eggs = replicated_storage.Assets.Eggs
 local chest = workspace.Rendered.Chests
 local gifts = workspace.Rendered.Gifts
 local rifts = workspace.Rendered.Rifts
+local pickables = nil
+local game_eggs = nil
+
+--// This prob so ass idk
+
+for _, v in next, workspace.Rendered:GetChildren() do
+    if v:IsA("Folder") then
+        local model = v:FindFirstChildWhichIsA("Model")
+        if model then
+            if model:FindFirstChildWhichIsA("MeshPart") and (model:FindFirstChildWhichIsA("MeshPart").Name:find("Coin") or model:FindFirstChildWhichIsA("MeshPart").Name:find("Ticket") or model:FindFirstChildWhichIsA("MeshPart").Name:find("coin")) then
+                pickables = v
+            end
+            if model.Name:find("Egg") then
+                game_eggs = v
+            end
+        end
+    end
+end
 
 local data = local_data:Get()
 
@@ -102,35 +117,28 @@ local auto_open = false
 local log_chats = false
 local auto_blow = false
 local auto_sell = false
+local auto_roll = false
 local log_eggs = false
 local stop_at = false
 
---[[
 local selected_enchant_method = ""
-]]
 local selected_gift = "Mystery Box"
 local collect_method = "Remote"
---[[
 local selected_enchant = ""
-]]
 local selected_island = ""
 local selected_potion = ""
---[[
-local selected_pet = ""
-]]
+local selected_dice = ""
 local selected_egg = ""
 
 local selected_enchant_slot = 1
 local selected_potion_tier = 1
 local chest_open_delay = 1
 local potion_use_delay = 1
-local collect_speed = 0.5
+local collect_speed = 1
 local open_amount = 10
 
 local island_names = {}
---[[
-local current_pets = {}
-]]
+local dice = {}
 local egg = {}
 
 local enchantments = {
@@ -185,13 +193,21 @@ local potions = {
 }
 
 for _, v in next, eggs:GetChildren() do
-    if not (v.Name:find("Golden") or v.Name:find("Season") or v.Name:find("Shop") or v.Name:find("Package") or v.Name:find("Easter") or v.Name:find("Series") or v.Name:find("Bunny") or v.Name:find("Pastel") or v.Name:find("Throwback")) then
+    if not (v.Name:find("Golden") or v.Name:find("Season") or v.Name:find("Shop") or v.Name:find("Package") or v.Name:find("Easter") or v.Name:find("Series") or v.Name:find("Bunny") or v.Name:find("Pastel") or v.Name:find("Throwback") or v.Name:find("100M")) then
         table.insert(egg, v.Name)
     end
 end
 
 for _, v in next, overworld_islands:GetChildren() do
     table.insert(island_names, v.Name)
+end
+
+for _, v in next, minigame_paradise_islands:GetChildren() do
+    table.insert(island_names, v.Name)
+end
+
+for _, v in next, dices:GetChildren() do
+    table.insert(dice, v.Name)
 end
 
 rifts.ChildAdded:Connect(function(egg)
@@ -394,11 +410,11 @@ farm_group:AddToggle('auto_blow', {
     Tooltip = 'Auto Blows Bubbles',
     Callback = function(Value)
         auto_blow = Value
-        while task.wait() do
-            if auto_blow then
+        if Value then
+            repeat
                 remote:FireServer("BlowBubble")
-            end
-            task.wait(.5)
+                task.wait(.5)
+            until not auto_blow
         end
     end
 })
@@ -409,11 +425,11 @@ farm_group:AddToggle('auto_sell', {
     Tooltip = 'Auto Sells Your Bubbles (MUST BE CLOSE TO A SELLZONE)',
     Callback = function(Value)
         auto_sell = Value
-        while task.wait() do
-            if auto_sell then
+        if Value then
+            repeat
                 remote:FireServer("SellBubble")
-            end
-            task.wait(.5)
+                task.wait(.5)
+            until not auto_sell
         end
     end
 })
@@ -452,11 +468,11 @@ farm_group:AddToggle('equip_best', {
     Tooltip = 'Auto Equips Best Pets',
     Callback = function(Value)
         equip_best = Value
-        while task.wait() do
-            if equip_best then
+        if Value then
+            repeat
                 remote:FireServer("EquipBestPets")
                 task.wait(10)
-            end
+            until not equip_best
         end
     end
 })
@@ -470,37 +486,23 @@ farm_group:AddToggle('auto_collect', {
     Callback = function(Value)
         auto_collect = Value
         if Value then
-            replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands.Zen.Island.Portal.Spawn")
-        end
-        task.wait(2.5)
-
-        while task.wait() do
-            if auto_collect and collect_method == "Tp" then
-                for _, v in next, pickables:GetChildren() do
-                    if v:IsA("Model") then
-                        local part = v:FindFirstChildWhichIsA("Part") or v:FindFirstChildWhichIsA("MeshPart")
-                        if part then
-                            local_player.Character.HumanoidRootPart.CFrame = part.CFrame
+            repeat
+                if auto_collect then
+                    for _, v in next, pickables:GetChildren() do
+                        if v and v:IsA("Model") then
+                            replicated_storage:WaitForChild("Remotes"):WaitForChild("Pickups"):WaitForChild("CollectPickup"):FireServer(v.Name)
+                            v:Destroy()
                             task.wait(collect_speed)
                         end
                     end
                 end
-            elseif auto_collect and collect_method == "Remote" then
-                for _, v in next, pickables:GetChildren() do
-                    if v:IsA("Model") then
-                        replicated_storage:WaitForChild("Remotes"):WaitForChild("Pickups"):WaitForChild("CollectPickup"):FireServer(v.Name)
-                        v:Destroy()
-                        task.wait(collect_speed)
-                    end
-                end
-            end
 
-            if stop_at and local_player.PlayerGui.ScreenGui.HUD.Left.Currency.Gems.Frame.Max.Visible then
-                library:Notify("Stopped AutoFarm Reached Max Gems")
-                replicated_storage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands.Zen.Island.Portal.Spawn")
-                auto_collect = false
-                break
-            end
+                if stop_at and local_player.PlayerGui.ScreenGui.HUD.Left.Currency.Gems.Frame.Max.Visible then
+                    library:Notify("Stopped AutoFarm Reached Max Gems")
+                    auto_collect = false
+                    break
+                end
+            until not auto_collect
         end
     end
 })
@@ -515,25 +517,12 @@ farm_group:AddToggle('stop_at_max', {
 })
 farm_group:AddSlider('auto_collect_speed', {
     Text = 'Auto Collect Speed',
-    Default = 0.5,
-    Min = 0.5,
+    Default = collect_speed,
+    Min = 0,
     Max = 5,
     Rounding = 0,
     Callback = function(Value)
         collect_speed = Value
-    end
-})
-
-farm_group:AddDropdown('collect_method', {
-    Values = { 'Tp', 'Remote' },
-    Default = "Remote",
-    Multi = false,
-
-    Text = 'Select Collect Method',
-    Tooltip = 'Select one of these methods to collect stuff idk',
-
-    Callback = function(Value)
-        collect_method = Value
     end
 })
 
@@ -559,6 +548,8 @@ misc_group:AddButton({
     Tooltip = 'Claims Free Legendary Pet',
 })
 
+misc_group:AddDivider()
+
 misc_group:AddButton({
     Text = 'Anti Afk',
     Func = function()
@@ -582,10 +573,29 @@ misc_group:AddButton({
     Tooltip = 'Credits to inf yield <3',
 })
 
+misc_group:AddDivider()
+
 misc_group:AddButton({
-    Text = 'Unlock islands',
+    Text = 'Unlock Overworld Islands',
     Func = function()
         for _, v in next, overworld_islands:GetDescendants() do
+            if v.Name == "UnlockHitbox" then
+                for i = 1, 10 do
+                    firetouchinterest(local_player.Character.HumanoidRootPart, v, 0)
+                    firetouchinterest(local_player.Character.HumanoidRootPart, v, 1)
+                    task.wait(.1)
+                end
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Unlocks all islands',
+})
+
+misc_group:AddButton({
+    Text = 'Unlock Minigame Islands',
+    Func = function()
+        for _, v in next, minigame_paradise_islands:GetDescendants() do
             if v.Name == "UnlockHitbox" then
                 for i = 1, 10 do
                     firetouchinterest(local_player.Character.HumanoidRootPart, v, 0)
@@ -630,35 +640,52 @@ auto_hatch_group:AddToggle('auto_hatch', {
         end
 
         function goto_egg()
-            if Value and selected_egg == "100M Egg" then
-                remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
+            if Value and selected_egg == "Game Egg" then
+                remote:FireServer("Teleport", "Workspace.Worlds.Minigame Paradise.PortalSpawn")
                 task.wait(0.5)
-                local to = workspace.Rendered:GetChildren()[11]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
+                local velocity_connection = run_service.Heartbeat:Connect(function()
+                    if local_player.Character.HumanoidRootPart then
+                        local_player.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+                        local_player.Character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+                    end
+                end)
+                local to = game_eggs:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
                 local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
                 tween:Play()
                 tween.Completed:Wait()
+                if velocity_connection then
+                    velocity_connection:Disconnect()
+                end
                 return
-            elseif Value and selected_egg ~= "100M Egg" then
+            elseif Value and selected_egg ~= "Game Egg" then
                 remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.FastTravel.Spawn")
                 task.wait(0.5)
+                local velocity_connection = run_service.Heartbeat:Connect(function()
+                    if local_player.Character.HumanoidRootPart then
+                        local_player.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+                        local_player.Character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+                    end
+                end)
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(workspace.Rendered.Generic["Infinity Egg"].Hitbox.Position)})
                 tween:Play()
                 tween.Completed:Wait()
-        
-                local to = workspace.Rendered:GetChildren()[11]:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
+                if velocity_connection then
+                    velocity_connection:Disconnect()
+                end
+                local to = game_eggs:FindFirstChild(selected_egg):FindFirstChildWhichIsA("Part")
                 local distance = (to.Position - local_player.Character.HumanoidRootPart.Position).magnitude
                 local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / 25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(to.Position) + Vector3.new(0, 0, 3)})
                 tween:Play()
                 tween.Completed:Wait()
             end
-        end        
+        end
 
         goto_egg()
 
         repeat
             remote:FireServer("HatchEgg", selected_egg, stat:GetMaxEggHatches(data))
-            task.wait(stat:GetHatchSpeed(data) / 3)
+            task.wait(stat:GetHatchSpeed(data) / 5)
         until not auto_hatch
     end
 })
@@ -684,8 +711,13 @@ teleport_group:AddButton({
             return
         end
 
-        remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands." .. selected_island .. ".Island.Portal.Spawn")
-        library:Notify('Teleported to ' .. selected_island)
+        if overworld_islands:FindFirstChild(selected_island) then
+            library:Notify('Teleported to ' .. selected_island)
+            remote:FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands." .. selected_island .. ".Island.Portal.Spawn")
+        elseif minigame_paradise_islands:FindFirstChild(selected_island) then
+            library:Notify('Teleported to ' .. selected_island)
+            remote:FireServer("Teleport", "Workspace.Worlds.Minigame Paradise.Islands." .. selected_island .. ".Island.Portal.Spawn")
+        end
     end,
     DoubleClick = false,
     Tooltip = 'Teleports to selected island',
@@ -725,14 +757,14 @@ auto_group:AddToggle('auto_doggy', {
     Tooltip = 'Auto Claims Doggy Jump Minigame',
     Callback = function(Value)
         auto_doggy = Value
-        while task.wait() do
-            if auto_doggy then
+        if Value then
+            repeat
                 for i = 1, 3 do
                     remote:FireServer("DoggyJumpWin", i)
                     task.wait(.25)
                 end
-                task.wait(5)
-            end
+                task.wait(600)
+            until not auto_doggy
         end
     end
 })
@@ -745,13 +777,13 @@ auto_group:AddToggle('auto_claim_chest', {
     Tooltip = 'Auto Claims Chest',
     Callback = function(Value)
         auto_chest = Value
-        while task.wait() do
-            if auto_chest then
+        if Value then
+            repeat
                 for _, v in next, chest:GetChildren() do
                     remote:FireServer("ClaimChest", v.Name, true)
                 end
-                task.wait(5)
-            end
+                task.wait(300)
+            until not auto_chest
         end
     end
 })
@@ -762,15 +794,15 @@ auto_group:AddToggle('auto_claim_playtime', {
     Tooltip = 'Auto Claims Playtime Rewards',
     Callback = function(Value)
         auto_playtime = Value
-        while task.wait() do
-            if auto_playtime then
+        if Value then
+            repeat
                 for i = 1, 9 do
                     remote:FireServer("ClaimPlaytime", i)
                     remote:InvokeServer("ClaimPlaytime", i)
                     task.wait()
                 end
-                task.wait(5)
-            end
+                task.wait(60)
+            until not auto_playtime
         end
     end
 })
@@ -781,11 +813,11 @@ auto_group:AddToggle('auto_claim_tickets', {
     Tooltip = 'Auto Claims Tickets',
     Callback = function(Value)
         auto_ticket = Value
-        while task.wait() do
-            if auto_ticket then
+        if Value then
+            repeat
                 remote:FireServer("ClaimFreeWheelSpin")
-            end
-            task.wait(5)
+                task.wait(1260)
+            until not auto_ticket
         end
     end
 })
@@ -796,12 +828,12 @@ auto_group:AddToggle('auto_spin_wheel', {
     Tooltip = 'Auto Spins Wheel',
     Callback = function(Value)
         auto_wheel = Value
-        while task.wait() do
-            if auto_wheel then
+        if Value then
+            repeat
                 remote:InvokeServer("WheelSpin")
                 remote:FireServer("ClaimWheelSpinQueue")
-            end
-            task.wait(5)
+                task.wait(5)
+            until not auto_wheel
         end
     end
 })
@@ -812,11 +844,86 @@ auto_group:AddToggle('auto_claim_seasonal', {
     Tooltip = 'Auto Claims Season Rewards',
     Callback = function(Value)
         auto_season = Value
-        while task.wait() do
-            if auto_season then
+        if Value then
+            repeat
                 remote:FireServer("ClaimSeason")
+                task.wait(5)
+            until not auto_season
+        end
+    end
+})
+
+auto_group:AddDivider()
+
+auto_group:AddButton({
+    Text = 'Get Everything In Claw Mashine',
+    Func = function()
+        if workspace:FindFirstChild("ClawMachine") then
+            for _, v in next, workspace.ClawMachine:GetChildren() do
+                if v.Name:find("Capsule") then
+                    remote:FireServer("GrabMinigameItem", v:GetAttribute("ItemGUID"))
+                    v:Destroy()
+                    task.wait(3.5)
+                end
             end
-            task.wait(5)
+            remote:FireServer("FinishMinigame")
+        else
+            library:Notify("Claw Machine Not Found")
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Gets every capsule from claw mashine'
+})
+
+auto_group:AddButton({
+    Text = 'Finish Paradise Minigame',
+    Func = function()
+        if not (local_player.PlayerGui.ScreenGui.MinigameHUD["Cart Escape"].Visible or local_player.PlayerGui.ScreenGui.MinigameHUD["Pet Match"].Visible) then
+            library:Notify("Minigame Not Found")
+            return
+        end
+
+        library:Notify("Wait ~20 sec for it to finish")
+        task.wait(20)
+        remote:FireServer("FinishMinigame")
+    end,
+    DoubleClick = false,
+    Tooltip = 'Finishes current minigame'
+})
+
+auto_group:AddDivider()
+
+auto_group:AddDropdown('dice_selector', {
+    Values = dice,
+    Default = selected_dice,
+    Multi = false,
+
+    Text = 'Select Dice To Roll:',
+    Tooltip = 'Select a dice to use for auto roll',
+
+    Callback = function(Value)
+        selected_dice = Value
+    end
+})
+
+auto_group:AddToggle('auto_roll', {
+    Text = 'Auto Roll Dice',
+    Default = auto_roll,
+    Tooltip = 'Rolls selected dice',
+
+    Callback = function(Value)
+        auto_roll = Value
+        if Value then
+            if selected_dice == "" then
+                library:Notify("Please select a dice to roll before using this")
+                return
+            end
+
+            repeat
+                remote:InvokeServer("RollDice", selected_dice)
+                remote:FireServer("ClaimTile")
+                task.wait(2)
+            until not auto_roll
         end
     end
 })
@@ -864,12 +971,12 @@ auto_use_group:AddToggle('auto_potion', {
     Tooltip = 'Auto Uses Potions',
     Callback = function(Value)
         auto_potion = Value
-        while task.wait() do
-            if auto_potion then
+        if Value then
+            repeat
                 remote:FireServer("UsePotion", selected_potion, selected_potion_tier)
                 library:Notify('Used ' .. selected_potion .. ' tier ' .. selected_potion_tier)
                 task.wait(potion_use_delay)
-            end
+            until not auto_potion
         end
     end
 })
@@ -882,11 +989,11 @@ auto_use_group:AddToggle('auto_gold_orb', {
     Tooltip = 'Auto Uses Gold Orbs',
     Callback = function(Value)
         auto_gold_orb = Value
-        while task.wait() do
-            if auto_gold_orb then
+        if Value then
+            repeat
                 remote:FireServer("UseGoldenOrb")
                 task.wait(900)
-            end
+            until not auto_gold_orb
         end
     end
 })
@@ -912,8 +1019,8 @@ auto_use_group:AddToggle('auto_open', {
     Tooltip = 'Auto Opens Chests',
     Callback = function(Value)
         auto_open = Value
-        while task.wait() do
-            if auto_open then
+        if Value then
+            repeat
                 remote:FireServer("UseGift", selected_gift, open_amount)
                 task.wait()
                 for _, v in next, gifts:GetChildren() do
@@ -921,7 +1028,7 @@ auto_use_group:AddToggle('auto_open', {
                     v:Destroy()
                 end
                 task.wait(chest_open_delay)
-            end
+            until not auto_open
         end
     end
 })
@@ -1232,6 +1339,7 @@ menu_group:AddButton('Unload', function()
     auto_blow = false
     auto_open = false
     auto_sell = false
+    auto_dice = false
     log_eggs = false
     stop_at = false
     watermark_connection:Disconnect()
