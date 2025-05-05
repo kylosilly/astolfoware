@@ -134,7 +134,7 @@ local selected_enchant_slot = 1
 local selected_potion_tier = 1
 local chest_open_delay = 1
 local potion_use_delay = 1
-local collect_speed = 1
+local collect_speed = 2
 local open_amount = 10
 
 local island_names = {}
@@ -526,7 +526,7 @@ farm_group:AddToggle('stop_at_max', {
 farm_group:AddSlider('auto_collect_speed', {
     Text = 'Auto Collect Speed',
     Default = collect_speed,
-    Min = 1,
+    Min = 2,
     Max = 5,
     Rounding = 0,
     Callback = function(Value)
