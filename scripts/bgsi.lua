@@ -487,18 +487,25 @@ farm_group:AddToggle('auto_collect', {
         auto_collect = Value
         if Value then
             repeat
-                if auto_collect then
-                    for _, v in next, pickables:GetChildren() do
-                        if v and v:IsA("Model") then
-                            replicated_storage:WaitForChild("Remotes"):WaitForChild("Pickups"):WaitForChild("CollectPickup"):FireServer(v.Name)
-                            v:Destroy()
-                            task.wait(collect_speed)
-                        end
+                local collectables = {}
+
+                for _, v in next, pickables:GetChildren() do
+                    if v:IsA("Model") then
+                        table.insert(collectables, v)
+                    end
+                end
+
+                if #collectables > 0 then
+                    for i, v in next, collectables do
+                        v:Destroy()
+                        replicated_storage:WaitForChild("Remotes"):WaitForChild("Pickups"):WaitForChild("CollectPickup"):FireServer(v.Name)
+                        table.remove(collectables, i)
+                        task.wait(collect_speed)
                     end
                 end
 
                 if stop_at and local_player.PlayerGui.ScreenGui.HUD.Left.Currency.Gems.Frame.Max.Visible then
-                    library:Notify("Stopped AutoFarm Reached Max Gems")
+                    library:Notify("Stopped AutoFarm: Reached Max Gems")
                     auto_collect = false
                     break
                 end
@@ -506,6 +513,7 @@ farm_group:AddToggle('auto_collect', {
         end
     end
 })
+
 
 farm_group:AddToggle('stop_at_max', {
     Text = 'Stop At Max Gems',
