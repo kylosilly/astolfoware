@@ -518,7 +518,7 @@ farm_group:AddToggle('stop_at_max', {
 farm_group:AddSlider('auto_collect_speed', {
     Text = 'Auto Collect Speed',
     Default = collect_speed,
-    Min = 0,
+    Min = 1,
     Max = 5,
     Rounding = 0,
     Callback = function(Value)
