@@ -495,7 +495,7 @@ farm_group:AddToggle('auto_collect', {
                     end
                 end
 
-                if #collectables > 0 then
+                if #collectables > 1 then
                     for i, v in next, collectables do
                         v:Destroy()
                         replicated_storage:WaitForChild("Remotes"):WaitForChild("Pickups"):WaitForChild("CollectPickup"):FireServer(v.Name)
