@@ -17,7 +17,7 @@ local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManag
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
 local window = library:CreateWindow({
-    Title = 'Astolfo Ware | Made By @kylosilly',
+    Title = 'Astolfo Ware | Made By @kylosilly | Have Fun Patching <3',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -237,12 +237,7 @@ game_group:AddButton({
 misc_group:AddButton({
     Text = 'Sell All [Testing]',
     Func = function()
-        for i, v in next, game_state:GetData().Inventory do
-            if not (v.Name:find("Pickaxe") or v.Name:find("Pick") or v.Name:find("Chopper") or v.Name:find("Sharkee") or v.Name:find("Demonaxe")) then
-                replicated_storage:WaitForChild("Remotes"):WaitForChild("SellItem"):FireServer(i, v.Amount)
-                task.wait()
-            end
-        end
+        replicated_storage:WaitForChild("Remotes"):WaitForChild("SellAll"):FireServer()
     end,
     DoubleClick = true,
     Tooltip = 'Sells every ore in your inventory'
@@ -259,12 +254,7 @@ misc_group:AddToggle('auto_sell', {
         auto_sell = Value
         if Value then
             repeat
-                for i, v in next, game_state:GetData().Inventory do
-                    if not (v.Name:find("Pickaxe") or v.Name:find("Pick") or v.Name:find("Chopper") or v.Name:find("Sharkee") or v.Name:find("Demonaxe")) then
-                        replicated_storage:WaitForChild("Remotes"):WaitForChild("SellItem"):FireServer(i, v.Amount)
-                        task.wait()
-                    end
-                end
+                replicated_storage:WaitForChild("Remotes"):WaitForChild("SellAll"):FireServer()
                 task.wait(sell_delay)
             until not auto_sell
         end
