@@ -35,6 +35,9 @@ elseif place_id == 85896571713843 then
 elseif place_id == 81319028163805 then
     loadstring(game:HttpGet(scripts.."mining%20world.lua"))()
     lib:Notify('Supported game loading: ' .. info.Name)
+elseif place_id == 87700573492940 then
+    loadstring(game:HttpGet(scripts.."untitled%20drill%20game.lua"))()
+    lib:Notify('Supported game loading: ' .. info.Name)
 else
     lib:Notify('Game not supported: ' .. info.Name .. ' if you wanna support this game join the discord copied to your clipboard')
     setclipboard("https://discord.gg/U5yjDvsxHR")
