@@ -41,6 +41,7 @@ elseif game.PlaceId == 89726090098716 then
 
     for i = 1, getfenv().settings.dupe_amount do
         replicated_storage:WaitForChild("Postie"):WaitForChild("Sent"):FireServer("PlantEgg", guid, workspace:WaitForChild("Plots"):WaitForChild(local_player.Name.."_Plot"):WaitForChild(local_player.Name.."_Soil"), local_player.Character:GetPivot().Position - Vector3.new(0, 4.5, 0), "DragonTowerEgg")
+        task.wait(3)
     end
     local_player.Character.HumanoidRootPart.Anchored = false
     library:Notify("Done Duping")
