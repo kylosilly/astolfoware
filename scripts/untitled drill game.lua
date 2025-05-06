@@ -169,10 +169,12 @@ mine_group:AddToggle('auto_collect_drills', {
         if Value then
             repeat
                 for _, v in next, plot.Drills:GetChildren() do
-                    if drill_collect_method == "Full" and not v.DrillData.Drilling.Value then
+                    if drill_collect_method == "Full" and v:FindFirstChild("DrillData") and not v.DrillData:FindFirstChild("Drilling").Value then
                         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlotService"):WaitForChild("RE"):WaitForChild("CollectDrill"):FireServer(v)
-                    elseif drill_collect_method == "An Ore" and v.Ores:FindFirstChildOfClass("IntValue") then
+                        task.wait(.5)
+                    elseif drill_collect_method == "An Ore" and v:FindFirstChild("Ores") and v.Ores:FindFirstChildOfClass("IntValue") then
                         replicated_storage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("PlotService"):WaitForChild("RE"):WaitForChild("CollectDrill"):FireServer(v)
+                        task.wait(.5)
                     end
                 end
                 task.wait()
