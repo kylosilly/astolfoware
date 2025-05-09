@@ -26,6 +26,7 @@ local window = library:CreateWindow({
 
 local tabs = {
     main = window:AddTab('Main'),
+    inventory = window:AddTab('Inventory'),
     shop = window:AddTab('Shop'),
     misc = window:AddTab('Misc'),
     event = window:AddTab('Event'),
@@ -34,6 +35,7 @@ local tabs = {
 
 local plant_group = tabs.main:AddLeftGroupbox('Plant Settings')
 local egg_group = tabs.main:AddRightGroupbox('Egg Settings')
+local favorite_group = tabs.inventory:AddLeftGroupbox('Favorite Settings')
 local seed_shop_group = tabs.shop:AddLeftGroupbox('Seed Shop Settings')
 local gear_shop_group = tabs.shop:AddRightGroupbox('Gear Shop Settings')
 local egg_shop_group = tabs.shop:AddLeftGroupbox('Egg Shop Settings')
@@ -54,7 +56,7 @@ local getgc = getconnections or get_signal_cons
 local info = market:GetProductInfo(game.PlaceId)
 local local_player = players.LocalPlayer
 
---// To Fix Swift Require
+--// Fix Shitsploit
 if identifyexecutor() == "Swift" then
     print("Fixed Require")
     setthreadidentity(8)
@@ -64,14 +66,18 @@ local egg_shop = require(replicated_storage.Data.PetEggData)
 local seed_shop = require(replicated_storage.Data.SeedData)
 local gear_shop = require(replicated_storage.Data.GearData)
 
+local selected_mutations = {}
 local selected_seeds = {}
 local selected_gears = {}
 local selected_eggs = {}
+local mutations = {}
 local seeds = {}
 local gears = {}
 local eggs = {}
 
-local egg_location = workspace.NPCS["Pet Stand"].EggLocations
+local egg_location = workspace:FindFirstChild("NPCS"):FindFirstChild("Pet Stand"):FindFirstChild("EggLocations")
+local seed_models = replicated_storage:FindFirstChild("Seed_Models")
+local pets = workspace:FindFirstChild("PetsPhysical")
 local farm = nil
 
 for _, v in next, workspace:FindFirstChild("Farm"):GetDescendants() do
@@ -81,7 +87,7 @@ for _, v in next, workspace:FindFirstChild("Farm"):GetDescendants() do
 end
 
 for i, v in next, seed_shop do
-    if v.StockChance > 0 then -- Can also use: if not v.DisplayInShop then
+    if v.StockChance > 0 then -- Can also use: if v.DisplayInShop then
         table.insert(seeds, i)
     end
 end
@@ -98,20 +104,31 @@ for _, v in next, gear_shop do
     end
 end
 
+for _, v in next, replicated_storage.Mutation_FX:GetChildren() do
+    table.insert(mutations, v.Name)
+end
+table.insert(mutations, "Gold")
+table.insert(mutations, "Rainbow")
+
 local auto_buy_seeds = false
 local auto_buy_gears = false
 local auto_buy_eggs = false
+local auto_favorite = false
 local pickup_aura = false
 local hatch_aura = false
 local auto_sell = false
 
+local pickup_aura_range = 20
 local pickup_aura_delay = 0.1
 local hatch_aura_delay = 0.1
+local min_pickup_aura = nil
+local favorite_delay = 0.1
 local gear_buy_delay = 1
 local seed_buy_delay = 1
 local egg_buy_delay = 1
 local dupe_amount = 1
 local sell_delay = 10
+local min_weight = nil
 
 local dupe_method = "Closest"
 
@@ -119,7 +136,7 @@ function closest_pet()
     local pet = nil
     local distance = math.huge
 
-    for _, v in next, workspace:FindFirstChild("PetsPhysical"):GetChildren() do
+    for _, v in next, pets:GetChildren() do
         if v:IsA("Part") and v:GetAttribute("OWNER") == local_player.Name and v:GetAttribute("UUID") then
             local dist = (v:GetPivot().Position - local_player.Character:GetPivot().Position).Magnitude
             if dist < distance then
@@ -142,22 +159,22 @@ plant_group:AddToggle('pickup_aura', {
     Callback = function(Value)
         pickup_aura = Value
         if Value then
+            if not min_pickup_aura or tonumber(min_pickup_aura) < 0.01 then
+                library:Notify("Min Weight Must Be Above 0.01")
+                return
+            end
+
             repeat
                 for _, v in next, farm:FindFirstChild("Plants_Physical"):GetChildren() do
-                    if v:IsA("Model") and local_player.Character:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Fruits") then
-                        for _, v2 in next, v:FindFirstChild("Fruits"):GetChildren() do
-                            if v2:IsA("Model") and (v2:GetPivot().Position - local_player.Character:GetPivot().Position).Magnitude < 20 then
-                                for _, v3 in next, v2:GetChildren() do
-                                    if v3:IsA("Part") and v3:FindFirstChildOfClass("ProximityPrompt") then
-                                        fireproximityprompt(v3:FindFirstChildOfClass("ProximityPrompt"))
-                                        task.wait(pickup_aura_delay)
-                                    end
-                                end
+                    if v:IsA("Model") and local_player.Character:FindFirstChild("HumanoidRootPart") then
+                        for _, v2 in next, v:GetDescendants() do
+                            if v2:IsA("ProximityPrompt") and v2.Parent.Parent:FindFirstChild("Weight") and v2.Parent.Parent.Weight.Value > tonumber(min_pickup_aura) and (v:GetPivot().Position - local_player.Character:GetPivot().Position).Magnitude < pickup_aura_range then
+                                fireproximityprompt(v2)
                             end
                         end
                     end
                 end
-                task.wait()
+                task.wait(pickup_aura_delay)
             until not pickup_aura
         end
     end
@@ -166,13 +183,41 @@ plant_group:AddToggle('pickup_aura', {
 plant_group:AddSlider('pickup_aura_delay', {
     Text = 'Pickup Aura Delay:',
     Default = pickup_aura_delay,
-    Min = 0.1,
+    Min = 0,
     Max = 60,
     Rounding = 1,
     Compact = false,
 
     Callback = function(Value)
         pickup_aura_delay = Value
+    end
+})
+
+plant_group:AddSlider('pickup_aura_range', {
+    Text = 'Pickup Aura Range:',
+    Default = pickup_aura_range,
+    Min = 5,
+    Max = 20,
+    Rounding = 0,
+    Compact = false,
+
+    Callback = function(Value)
+        pickup_aura_range = Value
+    end
+})
+
+plant_group:AddInput('pickup_min_weight', {
+    Default = '',
+    Numeric = true,
+    Finished = true,
+
+    Text = 'Pickup At Min Weight:',
+    Tooltip = 'Will pick up above the weight',
+
+    Placeholder = '',
+
+    Callback = function(Value)
+        min_pickup_aura = Value
     end
 })
 
@@ -206,7 +251,7 @@ egg_group:AddToggle('hatch_aura', {
 egg_group:AddSlider('hatch_aura_delay', {
     Text = 'Hatch Aura Delay:',
     Default = hatch_aura_delay,
-    Min = 0.1,
+    Min = 0,
     Max = 60,
     Rounding = 1,
     Compact = false,
@@ -223,56 +268,55 @@ egg_group:AddButton({
     Func = function()
         local tool = local_player.Character:FindFirstChildOfClass("Tool")
 
+        if not tool then
+            library:Notify("Not Holding A Tool")
+            return
+        end
+
+        if tool:GetAttribute("ItemType") and not tool:GetAttribute("ItemType") == "Holdable" then
+            library:Notify("Not Holding A Holdable Item")
+            return
+        end
+
+        if tool:GetAttribute("Favorite") then
+            library:Notify("Cannot Feed Favorited Item")
+            return
+        end
+
         if dupe_method == "Closest" then
             local pet = closest_pet()
+
             if not pet then
-                library:Notify("No Pet Found!")
-                return
-            end
-    
-            if not tool then
-                library:Notify("Not Holding A Tool")
-                return
-            end
-            
-            --// Idk why i made the tool checks so long LMAO
-            for _, v in next, replicated_storage:FindFirstChild("Fruit_Spawn"):GetChildren() do
-                if not (tool.Name:find("Seed") and tool.Name:find("Shovel") or tool.Name:find("Water") or tool.Name:find("Trowel") or tool.Name:find("Sprinkler") or tool.Name:find("Rod") or tool.Name:find("Egg")) then
-                    for i = 1,dupe_amount do
-                        replicated_storage:WaitForChild("GameEvents"):WaitForChild("ActivePetService"):FireServer("Feed", pet:GetAttribute("UUID"))
-                    end
-                    library:Notify("Done Feeding")
-                    return
-                end
-            end
-        elseif dupe_method == "All" then
-            if not tool then
-                library:Notify("Not Holding A Tool")
+                library:Notify("No Pets Found")
                 return
             end
 
-            for _, v in next, replicated_storage:FindFirstChild("Fruit_Spawn"):GetChildren() do
-                if not (tool.Name:find("Seed") and tool.Name:find("Shovel") or tool.Name:find("Water") or tool.Name:find("Trowel") or tool.Name:find("Sprinkler") or tool.Name:find("Rod") or tool.Name:find("Egg")) then
-                    for i = 1,dupe_amount do
-                        for _, v in next, workspace:FindFirstChild("PetsPhysical"):GetChildren() do
-                            if v:IsA("Part") and v:GetAttribute("OWNER") == local_player.Name and v:GetAttribute("UUID") then
-                                replicated_storage:WaitForChild("GameEvents"):WaitForChild("ActivePetService"):FireServer("Feed", v:GetAttribute("UUID"))
-                            end
-                        end
+            for i = 1, dupe_amount do
+                replicated_storage:WaitForChild("GameEvents"):WaitForChild("ActivePetService"):FireServer("Feed", pet:GetAttribute("UUID"))
+            end
+            library:Notify("Done Feeding Pet")
+            return
+        end
+
+        if dupe_method == "All" then
+            for i = 1, dupe_amount do
+                for _, v in next, pets:GetChildren() do
+                    if v:IsA("Part") and v:GetAttribute("OWNER") == local_player.Name and v:GetAttribute("UUID") then
+                        replicated_storage:WaitForChild("GameEvents"):WaitForChild("ActivePetService"):FireServer("Feed", v:GetAttribute("UUID"))
                     end
-                    library:Notify("Done Feeding")
-                    return
                 end
             end
+            library:Notify("Done Feeding Pets")
+            return
         end
     end,
     DoubleClick = false,
-    Tooltip = 'This is the main button'
+    Tooltip = 'Feeds pets to max',
 })
 
 egg_group:AddDropdown('dupe_method', {
     Values = {'Closest', 'All'},
-    Default = 'Closest',
+    Default = dupe_method,
     Multi = false,
 
     Text = 'Select Max Feed Method:',
@@ -294,6 +338,97 @@ egg_group:AddSlider('dupe_amount', {
     Callback = function(Value)
         dupe_amount = Value
     end
+})
+
+favorite_group:AddDivider()
+
+favorite_group:AddToggle('auto_favorite', {
+    Text = 'Auto Favorite',
+    Default = auto_favorite,
+    Tooltip = 'Favorites fruits above choosen weight',
+
+    Callback = function(Value)
+        auto_favorite = Value
+        if Value then
+            if not min_weight or tonumber(min_weight) < 0.01 then
+                library:Notify("Min Weight Must Be Above 0.01")
+                return
+            end
+
+            repeat
+                for _, v in next, local_player:FindFirstChild("Backpack"):GetChildren() do
+                    for _, v2 in next, seed_models:GetChildren() do
+                        if v:IsA("Tool") and not v:GetAttribute("Favorite") and v:GetAttribute("ItemName") == v2.Name and v:FindFirstChild("Weight") and v.Weight.Value > tonumber(min_weight) then
+                            replicated_storage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(v)
+                        elseif selected_mutations then
+                            for i, _ in next, selected_mutations do
+                                if v:IsA("Tool") and not v:GetAttribute("Favorite") and v:GetAttribute("ItemName") == v2.Name and v.Name:find(i) then
+                                    replicated_storage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(v)
+                                end
+                            end
+                        end
+                    end
+                end
+                task.wait(favorite_delay)
+            until not auto_favorite
+        end
+    end
+})
+
+favorite_group:AddInput('min_weight', {
+    Default = min_weight,
+    Numeric = true,
+    Finished = true,
+
+    Text = 'Select Min Weight:',
+    Tooltip = 'Will favorite above the min weight',
+
+    Placeholder = '',
+
+    Callback = function(Value)
+        min_weight = Value
+    end
+})
+
+favorite_group:AddSlider('favorite_delay', {
+    Text = 'Select Favorite Delay:',
+    Default = favorite_delay,
+    Min = 0,
+    Max = 60,
+    Rounding = 1,
+    Compact = false,
+
+    Callback = function(Value)
+        favorite_delay = Value
+    end
+})
+
+favorite_group:AddDropdown('mutation_selector', {
+    Values = mutations,
+    Default = selected_mutations,
+    Multi = true,
+
+    Text = 'Select Mutations To Favorite:',
+    Tooltip = 'Favorites selected mutations',
+
+    Callback = function(Value)
+        selected_mutations = Value
+    end
+})
+
+favorite_group:AddDivider()
+
+favorite_group:AddButton({
+    Text = 'Unfavorite All',
+    Func = function()
+        for _, v in next, local_player:FindFirstChild("Backpack"):GetChildren() do
+            if v:GetAttribute("Favorite") then
+                replicated_storage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(v)
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Unfavorites all favorited fruits',
 })
 
 seed_shop_group:AddDivider()
@@ -391,7 +526,7 @@ gear_shop_group:AddDropdown('gear_selector', {
 gear_shop_group:AddSlider('gear_buy_delay', {
     Text = 'Gear Buy Delay:',
     Default = gear_buy_delay,
-    Min = 1,
+    Min = 0,
     Max = 60,
     Rounding = 0,
     Compact = false,
@@ -454,7 +589,7 @@ egg_shop_group:AddDropdown('egg_selector', {
 egg_shop_group:AddSlider('egg_buy_delay', {
     Text = 'Egg Buy Delay:',
     Default = egg_buy_delay,
-    Min = 1,
+    Min = 0,
     Max = 60,
     Rounding = 0,
     Compact = false,
@@ -479,23 +614,6 @@ egg_shop_group:AddButton({
     end,
     DoubleClick = false,
     Tooltip = 'Buys selected egg'
-})
-
-sell_settings:AddDivider()
-
-sell_settings:AddButton({
-    Text = 'Sell All',
-    Func = function()
-        local old = local_player.Character:FindFirstChild("HumanoidRootPart").CFrame
-        local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = workspace.Tutorial_Points.Tutorial_Point_2.CFrame
-        task.wait(.2)
-        replicated_storage:WaitForChild("GameEvents"):WaitForChild("Sell_Inventory"):FireServer()
-        task.wait(.2)
-        local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = old
-        library:Notify("Sold All")
-    end,
-    DoubleClick = false,
-    Tooltip = 'Sells Inventory'
 })
 
 sell_settings:AddDivider()
@@ -534,6 +652,54 @@ sell_settings:AddSlider('auto_sell_delay', {
     end
 })
 
+sell_settings:AddDivider()
+
+sell_settings:AddButton({
+    Text = 'Sell All',
+    Func = function()
+        local old = local_player.Character:FindFirstChild("HumanoidRootPart").CFrame
+        local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = workspace.Tutorial_Points.Tutorial_Point_2.CFrame
+        task.wait(.2)
+        replicated_storage:WaitForChild("GameEvents"):WaitForChild("Sell_Inventory"):FireServer()
+        task.wait(.2)
+        local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = old
+        library:Notify("Sold All")
+    end,
+    DoubleClick = false,
+    Tooltip = 'Sells Inventory'
+})
+
+sell_settings:AddButton({
+    Text = 'Sell Held Plant',
+    Func = function()
+        local tool = local_player.Character:FindFirstChildOfClass("Tool")
+
+        if not tool then
+            library:Notify("Not Holding A Tool")
+            return
+        end
+
+        if tool:GetAttribute("Favorite") then
+            library:Notify("Cannot Sell Favorited Item")
+            return
+        end
+
+        for _, v in next, seeds:GetChildren() do
+            if tool:GetAttribute("ItemName") == v.Name and tool:GetAttribute("ItemType") == "Holdable" then
+                local old = local_player.Character:FindFirstChild("HumanoidRootPart").CFrame
+                local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = workspace.Tutorial_Points.Tutorial_Point_2.CFrame
+                task.wait(.2)
+                replicated_storage:WaitForChild("GameEvents"):WaitForChild("Sell_Item"):FireServer()
+                task.wait(.2)
+                local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = old
+                library:Notify("Sold Item")
+            end
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Sells held item'
+})
+
 player_group:AddDivider()
 
 player_group:AddButton({
@@ -562,11 +728,14 @@ player_group:AddButton({
 player_group:AddButton({
     Text = 'Rejoin',
     Func = function()
-        -- Add queue_on_teleport here later fr idk
+        queue_on_teleport([[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/astolfo%20ware%20loader.lua"))()
+        ]])
+
         teleport_service:TeleportToPlaceInstance(game.PlaceId, game.JobId, local_player)
     end,
     DoubleClick = false,
-    Tooltip = 'Rejoins server'
+    Tooltip = 'Rejoins the game'
 })
 
 player_group:AddButton({
@@ -601,7 +770,6 @@ local FPS = 60;
 
 local watermark_connection = run_service.RenderStepped:Connect(function()
     FrameCounter += 1;
-
     if (tick() - FrameTimer) >= 1 then
         FPS = FrameCounter;
         FrameTimer = tick();
@@ -618,6 +786,7 @@ menu_group:AddButton('Unload', function()
     auto_buy_seeds = false
     auto_buy_gears = false
     auto_buy_eggs = false
+    auto_favorite = false
     pickup_aura = false
     hatch_aura = false
     auto_sell = false
