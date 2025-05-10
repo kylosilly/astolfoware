@@ -175,11 +175,12 @@ plant_group:AddToggle('pickup_aura', {
                         for _, v2 in next, v:GetDescendants() do
                             if v2:IsA("ProximityPrompt") and v2.Parent.Parent:FindFirstChild("Weight") and v2.Parent.Parent.Weight.Value > tonumber(min_pickup_aura) and (v:GetPivot().Position - local_player.Character:GetPivot().Position).Magnitude < pickup_aura_range then
                                 fireproximityprompt(v2)
+                                task.wait(pickup_aura_delay)
                             end
                         end
                     end
                 end
-                task.wait(pickup_aura_delay)
+                task.wait()
             until not pickup_aura
         end
     end
