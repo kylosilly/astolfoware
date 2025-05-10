@@ -110,6 +110,7 @@ end
 table.insert(mutations, "Gold")
 table.insert(mutations, "Rainbow")
 
+local auto_give_moonlits = false
 local auto_buy_seeds = false
 local auto_buy_gears = false
 local auto_buy_eggs = false
@@ -754,6 +755,28 @@ player_group:AddButton({
 
 event_group:AddDivider()
 
+event_group:AddToggle('auto_give_moonlits', {
+    Text = 'Auto Give Moonlit Items',
+    Default = auto_give_moonlits,
+    Tooltip = 'Automatically gives moonlit items',
+
+    Callback = function(Value)
+        auto_give_moonlits = Value
+        if Value then
+            repeat
+                for _, v in next, local_player.Backpack:GetChildren() do
+                    if v:IsA("Tool") and v.Name:find("Moonlit") then
+                        replicated_storage:WaitForChild("GameEvents"):WaitForChild("NightQuestRemoteEvent"):FireServer("SubmitAllPlants")
+                    end
+                end
+                task.wait(1)
+            until not auto_give_moonlits
+        end
+    end
+})
+
+event_group:AddDivider()
+
 event_group:AddButton({
     Text = 'Tp To Event',
     Func = function()
@@ -819,6 +842,7 @@ local watermark_connection = run_service.RenderStepped:Connect(function()
 end);
 
 menu_group:AddButton('Unload', function()
+    auto_give_moonlits = false
     auto_buy_seeds = false
     auto_buy_gears = false
     auto_buy_eggs = false
