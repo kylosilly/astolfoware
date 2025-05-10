@@ -116,21 +116,26 @@ local auto_buy_gears = false
 local auto_buy_eggs = false
 local auto_favorite = false
 local pickup_aura = false
+local auto_plant = false
 local hatch_aura = false
 local auto_sell = false
 
 local pickup_aura_range = 20
-local pickup_aura_delay = 0.01
+local pickup_aura_delay = 0.1
 local hatch_aura_delay = 0.1
-local min_pickup_aura = nil
+local min_pickup_aura = 0.01
 local favorite_delay = 0.1
 local gear_buy_delay = 1
 local seed_buy_delay = 1
 local egg_buy_delay = 1
 local dupe_amount = 1
+local plant_delay = 0.1
 local sell_delay = 10
-local min_weight = nil
+local min_weight = 0.01
 
+local plant_position = nil
+
+local auto_plant_method = "Player Position"
 local dupe_method = "Closest"
 
 function closest_pet()
@@ -189,9 +194,9 @@ plant_group:AddToggle('pickup_aura', {
 plant_group:AddSlider('pickup_aura_delay', {
     Text = 'Pickup Aura Delay:',
     Default = pickup_aura_delay,
-    Min = 0.01,
+    Min = 0.1,
     Max = 60,
-    Rounding = 2,
+    Rounding = 1,
     Compact = false,
 
     Callback = function(Value)
@@ -213,7 +218,7 @@ plant_group:AddSlider('pickup_aura_range', {
 })
 
 plant_group:AddInput('pickup_min_weight', {
-    Default = '',
+    Default = min_pickup_aura,
     Numeric = true,
     Finished = true,
 
@@ -225,6 +230,77 @@ plant_group:AddInput('pickup_min_weight', {
     Callback = function(Value)
         min_pickup_aura = Value
     end
+})
+
+plant_group:AddDivider()
+
+plant_group:AddToggle('auto_plant', {
+    Text = 'Auto Plant',
+    Default = auto_plant,
+    Tooltip = 'Auto plants held seed',
+
+    Callback = function(Value)
+        auto_plant = Value
+        if Value then
+            if auto_plant_method == "Choosen Position" and not plant_position then
+                library:Notify("No Position Found To Plant")
+                return
+            end
+
+            repeat
+                if local_player.Character and local_player.Character:FindFirstChildOfClass("Tool") and local_player.Character:FindFirstChildOfClass("Tool"):GetAttribute("ItemType") == "Seed" then
+
+                    if auto_plant_method == "Choosen Position" then
+                        replicated_storage:WaitForChild("GameEvents"):WaitForChild("Plant_RE"):FireServer(plant_position, local_player.Character:FindFirstChildOfClass("Tool"):GetAttribute("ItemName"))
+                    elseif auto_plant_method == "Player Position" then
+                        replicated_storage:WaitForChild("GameEvents"):WaitForChild("Plant_RE"):FireServer(local_player.Character:GetPivot().Position, local_player.Character:FindFirstChildOfClass("Tool"):GetAttribute("ItemName"))
+                    end
+
+                    task.wait(plant_delay)
+                end
+                task.wait()
+            until not auto_plant
+        end
+    end
+})
+
+plant_group:AddDropdown('auto_plant_method', {
+    Values = { 'Choosen Position', 'Player Position' },
+    Default = auto_plant_method,
+    Multi = false,
+
+    Text = 'Select Auto Plant Method:',
+    Tooltip = 'Auto plants with selected method',
+
+    Callback = function(Value)
+        auto_plant_method = Value
+    end
+})
+
+plant_group:AddSlider('plant_delay', {
+    Text = 'Auto Plant Delay:',
+    Default = plant_delay,
+    Min = 0,
+    Max = 10,
+    Rounding = 1,
+    Compact = false,
+
+    Callback = function(Value)
+        plant_delay = Value
+    end
+})
+
+plant_group:AddDivider()
+
+plant_group:AddButton({
+    Text = 'Get Choosen Position',
+    Func = function()
+        if local_player.Character then
+            plant_position = local_player.Character:GetPivot().Position
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = 'Get Position For Choosen Position',
 })
 
 egg_group:AddDivider()
@@ -239,7 +315,7 @@ egg_group:AddToggle('hatch_aura', {
         if Value then
             repeat
                 for _, v in next, farm:FindFirstChild("Objects_Physical"):GetChildren() do
-                    if v:IsA("Model") and v:GetAttribute("TimeToHatch") == 0 and (v:GetPivot().Position - local_player.Character:GetPivot().Position).Magnitude < 20 then
+                    if v:IsA("Model") and v:GetAttribute("TimeToHatch") == 0 and local_player.Character and (v:GetPivot().Position - local_player.Character:GetPivot().Position).Magnitude < 20 then
                         for _, v2 in next, v:FindFirstChildOfClass("Model"):GetChildren() do
                             if v2:IsA("ProximityPrompt") and v2.Name == "ProximityPrompt" then
                                 fireproximityprompt(v2)
@@ -257,7 +333,7 @@ egg_group:AddToggle('hatch_aura', {
 egg_group:AddSlider('hatch_aura_delay', {
     Text = 'Hatch Aura Delay:',
     Default = hatch_aura_delay,
-    Min = 0.01,
+    Min = 0.1,
     Max = 60,
     Rounding = 2,
     Compact = false,
@@ -633,13 +709,15 @@ sell_settings:AddToggle('auto_sell', {
         auto_sell = Value
         if Value then
             repeat
-                local old = local_player.Character:FindFirstChild("HumanoidRootPart").CFrame
-                local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = workspace.Tutorial_Points.Tutorial_Point_2.CFrame
-                task.wait(.2)
-                replicated_storage:WaitForChild("GameEvents"):WaitForChild("Sell_Inventory"):FireServer()
-                task.wait(.2)
-                local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = old
-                task.wait(sell_delay)
+                if local_player.Character and local_player.Character:FindFirstChild("HumanoidRootPart") then
+                    local old = local_player.Character:FindFirstChild("HumanoidRootPart").CFrame
+                    local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = workspace.Tutorial_Points.Tutorial_Point_2.CFrame
+                    task.wait(.2)
+                    replicated_storage:WaitForChild("GameEvents"):WaitForChild("Sell_Inventory"):FireServer()
+                    task.wait(.2)
+                    local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = old
+                    task.wait(sell_delay)
+                end
             until not auto_sell
         end
     end
@@ -691,7 +769,7 @@ sell_settings:AddButton({
         end
 
         for _, v in next, seeds:GetChildren() do
-            if tool:GetAttribute("ItemName") == v.Name and tool:GetAttribute("ItemType") == "Holdable" then
+            if tool:GetAttribute("ItemType") == v.Name and tool:GetAttribute("ItemType") == "Holdable" then
                 local old = local_player.Character:FindFirstChild("HumanoidRootPart").CFrame
                 local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = workspace.Tutorial_Points.Tutorial_Point_2.CFrame
                 task.wait(.2)
@@ -849,6 +927,7 @@ menu_group:AddButton('Unload', function()
     auto_buy_eggs = false
     auto_favorite = false
     pickup_aura = false
+    auto_plant = false
     hatch_aura = false
     auto_sell = false
     watermark_connection:Disconnect()
