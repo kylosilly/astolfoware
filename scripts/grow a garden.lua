@@ -151,6 +151,10 @@ end
 
 plant_group:AddDivider()
 
+plant_group:AddLabel("If Pickup Aura Delay Is Low Theres A Chance To Insta Collect Before Planted", true)
+
+plant_group:AddDivider()
+
 plant_group:AddToggle('pickup_aura', {
     Text = 'Pickup Aura',
     Default = pickup_aura,
@@ -751,17 +755,49 @@ player_group:AddButton({
 event_group:AddDivider()
 
 event_group:AddButton({
-    Text = 'Submit Held Plant',
+    Text = 'Tp To Event',
     Func = function()
-        local old = local_player.Character:FindFirstChild("HumanoidRootPart").CFrame
-        local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = workspace.SeedPack["26"].Part.CFrame
-        task.wait(.2)
-        replicated_storage:WaitForChild("GameEvents"):WaitForChild("SeedPackGiverEvent"):FireServer("SubmitHeldPlant")
-        task.wait(1)
-        local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = old
+        local_player.Character:FindFirstChild("HumanoidRootPart").CFrame = workspace.NightEvent.OwlNPCTree["26"].Part.CFrame + Vector3.new(0, 5, 0)
     end,
     DoubleClick = false,
-    Tooltip = 'Gives held plant to the hungry plant'
+    Tooltip = 'Teleports you to the event platform'
+})
+
+event_group:AddButton({
+    Text = 'Give All Moonlit Items',
+    Func = function()
+        for _, v in next, local_player.Backpack:GetChildren() do
+            if v:IsA("Tool") and v.Name:find("Moonlit") then
+                replicated_storage:WaitForChild("GameEvents"):WaitForChild("NightQuestRemoteEvent"):FireServer("SubmitAllPlants")
+                return
+            end
+        end
+
+        library:Notify("No Moonlit Items Found")
+    end,
+    DoubleClick = false,
+    Tooltip = 'Gives all moonlit items'
+})
+
+event_group:AddButton({
+    Text = 'Give Held Moonlit Item',
+    Func = function()
+        local tool = local_player.Character:FindFirstChildOfClass("Tool")
+
+        if not tool then
+            library:Notify("Not Holding A Tool")
+            return
+        end
+
+        if not tool.Name:find("Moonlit") then
+            library:Notify("Not Holding A Moonlit Item")
+            return
+        end
+
+        replicated_storage:WaitForChild("GameEvents"):WaitForChild("NightQuestRemoteEvent"):FireServer("SubmitHeldPlant")
+    end,
+    DoubleClick = false,
+    Tooltip = 'Gives held moonlit item'
 })
 
 local FrameTimer = tick()
