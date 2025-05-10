@@ -120,7 +120,7 @@ local hatch_aura = false
 local auto_sell = false
 
 local pickup_aura_range = 20
-local pickup_aura_delay = 0.1
+local pickup_aura_delay = 0.01
 local hatch_aura_delay = 0.1
 local min_pickup_aura = nil
 local favorite_delay = 0.1
@@ -189,9 +189,9 @@ plant_group:AddToggle('pickup_aura', {
 plant_group:AddSlider('pickup_aura_delay', {
     Text = 'Pickup Aura Delay:',
     Default = pickup_aura_delay,
-    Min = 0,
+    Min = 0.01,
     Max = 60,
-    Rounding = 1,
+    Rounding = 2,
     Compact = false,
 
     Callback = function(Value)
@@ -257,9 +257,9 @@ egg_group:AddToggle('hatch_aura', {
 egg_group:AddSlider('hatch_aura_delay', {
     Text = 'Hatch Aura Delay:',
     Default = hatch_aura_delay,
-    Min = 0,
+    Min = 0.01,
     Max = 60,
-    Rounding = 1,
+    Rounding = 2,
     Compact = false,
 
     Callback = function(Value)
