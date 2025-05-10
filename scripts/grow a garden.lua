@@ -7,7 +7,7 @@ end
 if getthreadcontext() > 7 then
     print("Executor Supported")
 else
-    game:Shutdown()
+    print("Since Many Were Confused, Executor Isnt Thread 7 Which Is Required For This Script To Work Use Swift Or Volcano!")
 end
 
 local repo = 'https://raw.githubusercontent.com/KINGHUB01/Gui/main/'
