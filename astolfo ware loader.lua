@@ -11,7 +11,7 @@ local place_id = game.PlaceId
 
 if identifyexecutor() then
     local executor = identifyexecutor()
-    if executor == "Solara" or executor == "Xeno" or executor == "Nezur" then
+    if executor == "Solara" or executor == "Xeno" or executor == "Nezur" or executor == "JJSploit" then
         lplr:Kick("Unsupported executor: " .. executor .. " Please use atlantis or a diffirent executor copied invite to your clipboard")
         setclipboard("https://discord.gg/KRkqCJjFG4")
     end
