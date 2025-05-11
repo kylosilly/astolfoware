@@ -303,7 +303,7 @@ misc_group:AddButton({
     Text = 'Rejoin',
     Func = function()
         queue_on_teleport([[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/astolfoware/refs/heads/main/astolfo%20ware%20loader.lua"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/kylosilly/Astolfo-Ware-V2/refs/heads/main/Loader.lua"))()
         ]])
 
         teleport_service:TeleportToPlaceInstance(game.PlaceId, game.JobId, local_player)
